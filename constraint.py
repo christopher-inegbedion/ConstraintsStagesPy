@@ -39,8 +39,7 @@ class Constraint(ABC):
         self.model.run(self.inputs)
 
     def validate_and_add_user_input(self, data):
-        """This method validates the data provided by the constraint user.
-            Used for USER input mode."""
+        """This method validates the data provided by the constraint user. Used for USER input mode."""
         if self.model.input_type == InputType.BOOL:  # boolean input
             if data.lower() == "true":
                 self.inputs.append(True)
@@ -60,27 +59,27 @@ class Constraint(ABC):
                 raise Exception("Invalid constraint input (INT type required)")
 
     def validate_and_add_predef_input(self, data):
-        """This method validates the data provided by the constraint.
-            Used for PRE_DEF input mode."""
-        if self.model.input_type == InputType.BOOL:
+        """This method validates the data provided by the constraint. Used for PRE_DEF input mode."""
+        if self.model.input_type == InputType.BOOL:  # bool input
             if type(data) != bool:
                 raise Exception("Invalid constraint input (BOOl type required)")
             else:
                 self.inputs.append(data)
-        elif self.model.input_type == InputType.STRING:
+        elif self.model.input_type == InputType.STRING:  # string input
             if type(data) != str:
                 raise Exception("Invalid constraint input (STRING type required)")
             else:
                 self.inputs.append(data)
-        elif self.model.input_type == InputType.INT:
+        elif self.model.input_type == InputType.INT:  # int input
             if type(data) != int:
                 raise Exception("Invalid constraint input (INT type required)")
             else:
                 self.inputs.append(data)
-        elif self.model.input_type == InputType.CONSTRAINT:
+        elif self.model.input_type == InputType.CONSTRAINT:  # constraint input
             self.inputs.append(data)
 
     def add_input(self, data):
+        """Add input to the constraint. This method is only used if the input mode is PRE_DEF"""
         # verify the input provided
         self.validate_and_add_predef_input(data)
 

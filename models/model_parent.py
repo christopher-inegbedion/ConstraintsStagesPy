@@ -2,14 +2,13 @@ from abc import ABC, abstractmethod
 from enums.model_family import ModelFamily
 from enums.input_type import InputType
 from enums.constraint_input_type import ConstraintInputType
-# from constraint import Constraint
 
 
 class Model:
-
     def __init__(self, name: str, model_family: ModelFamily, input_type: InputType,
                  input_mode: ConstraintInputType,
                  input_count: int, output_type):
+        """Abstract model class"""
         self.constraint = None  # the constraint that is utilizing the model
         self.name = name  # the name of the model
         self.model_family = model_family  # value to determine if the model is for a combined constraint or a normal one
@@ -19,16 +18,19 @@ class Model:
         self.output_type = output_type  # the type of the output that will be returned (BOOL, INT, STRING, etc)
         self.output = None
 
-
     def set_constraint(self, constraint):
+        """Set the constraint object using the model"""
         self.constraint = constraint
 
     @abstractmethod
     def run(self, inputs: list):
+        """Method that works on the input(s) provided and produces output"""
         pass
 
     @abstractmethod
     def _complete(self, data):  # call this method last in custom models
+        """Method that ends the constraint"""
+
         # ensure the output data is the same as the required output type
         if self.output_type == InputType.INT and type(data) != int:
             raise Exception("Invalid output type (Output type specified -> INT)")
@@ -36,4 +38,5 @@ class Model:
             raise Exception("Invalid output type (Output type specified -> STRING)")
         elif self.output_type == InputType.BOOL and type(data) != bool:
             raise Exception("Invalid output type (Output type specified -> BOOL)")
+
         self.constraint.flag.complete_constraint()
