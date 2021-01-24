@@ -1,3 +1,4 @@
+from exception_messages import *
 from flag import Flag
 from models.model_parent import Model
 from abc import ABC, abstractmethod
@@ -33,7 +34,7 @@ class Constraint(ABC):
                 self.validate_and_add_user_input(user_input)
         elif self.model.input_mode == ConstraintInputType.PRE_DEF:
             if len(self.inputs) > self.model.input_count:
-                raise Exception("Inputs entered more that required number of inputs")
+                raise Exception(INPUTS_ENTERED_MORE_THAN_REQUIRED)
 
         # begin the model
         self.model.run(self.inputs)
@@ -46,9 +47,12 @@ class Constraint(ABC):
             elif data.lower() == "false":
                 self.inputs.append(False)
             else:
-                raise Exception("Invalid constraint input (BOOl type required)")
+                raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
 
         elif self.model.input_type == InputType.STRING:  # string input
+            if data.isspace():
+                raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
+
             self.inputs.append(data)
 
         elif self.model.input_type == InputType.INT:  # int input
@@ -56,26 +60,29 @@ class Constraint(ABC):
                 if data.isnumeric():
                     self.inputs.append(int(data))
             else:
-                raise Exception("Invalid constraint input (INT type required)")
+                raise Exception(INVALID_CONSTRAINT_INPUT_INT)
 
     def validate_and_add_predef_input(self, data):
         """This method validates the data provided by the constraint. Used for PRE_DEF input mode."""
         if self.model.input_type == InputType.BOOL:  # bool input
             if type(data) != bool:
-                raise Exception("Invalid constraint input (BOOl type required)")
+                raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
             else:
                 self.inputs.append(data)
         elif self.model.input_type == InputType.STRING:  # string input
             if type(data) != str:
-                raise Exception("Invalid constraint input (STRING type required)")
+                raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
             else:
                 self.inputs.append(data)
         elif self.model.input_type == InputType.INT:  # int input
             if type(data) != int:
-                raise Exception("Invalid constraint input (INT type required)")
+                raise Exception(INVALID_CONSTRAINT_INPUT_INT)
             else:
                 self.inputs.append(data)
         elif self.model.input_type == InputType.CONSTRAINT:  # constraint input
+            if data is None:
+                raise Exception(INVALID_CONSTRAINT_INPUT_CONSTRAINT)
+
             self.inputs.append(data)
 
     def add_input(self, data):
