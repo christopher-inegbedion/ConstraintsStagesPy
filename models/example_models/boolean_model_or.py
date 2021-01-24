@@ -39,7 +39,3 @@ class BooleanModelOR(Model):
     def _complete(self, data):
         print(f"\t{self.constraint.name} complete with output -> {data}")
         super()._complete(data)
-
-        # save model's output
-        self.output = data
-        self.constraint.output = data

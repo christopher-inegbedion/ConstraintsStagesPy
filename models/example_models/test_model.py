@@ -27,7 +27,4 @@ class TestModel(Model):
         print(f"\tComplete with output -> {data}")
         super()._complete(data)
 
-        # print(f"{self.constraint.name}")
-        self.output = data
-        self.constraint.output = data
         print()

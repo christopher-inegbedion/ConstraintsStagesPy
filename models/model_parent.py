@@ -19,18 +19,9 @@ class Model:
         self.output_type = output_type  # the type of the output that will be returned (BOOL, INT, STRING, etc)
         self.output = None  # output produced by model
 
-        if model_family == ModelFamily.COMBINED_CONSTRAINT:
-            self.init_constraints_in_comb_constraint()
-
     def set_constraint(self, constraint):
         """Set the constraint object using the model"""
         self.constraint = constraint
-
-    def init_constraints_in_comb_constraint(self):
-        """Set the properties of a constraint in a combined constraint"""
-        for constraint in self.constraint.inputs:
-            constraint.flag.set_combined(True)
-            constraint.flag.set_required(True)
 
     @abstractmethod
     def run(self, inputs: list):
@@ -49,4 +40,7 @@ class Model:
         elif self.output_type == InputType.BOOL and type(data) != bool:
             raise Exception(INVALID_OUTPUT_TYPE_BOOL_REQUIRED)
 
+            # save model's output
+        self.output = data
+        self.constraint.output = data
         self.constraint.flag.complete_constraint()
