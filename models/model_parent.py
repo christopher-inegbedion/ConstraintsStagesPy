@@ -17,7 +17,7 @@ class Model:
         self.input_mode = input_mode  # how the model retrieves its data (USER, PRE-DEF, etc)
         self.input_count = input_count  # number of inputs of the model requires
         self.output_type = output_type  # the type of the output that will be returned (BOOL, INT, STRING, etc)
-        self.output = None
+        self.output = None  # output produced by model
 
     def set_constraint(self, constraint):
         """Set the constraint object using the model"""

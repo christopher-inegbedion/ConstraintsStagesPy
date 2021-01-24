@@ -36,5 +36,6 @@ class BooleanModel(Model):
         print(f"{self.constraint.name} complete with output -> {data}")
         super()._complete(data)
 
+        # save model's output
         self.output = data
         self.constraint.output = data

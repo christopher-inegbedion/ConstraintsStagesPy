@@ -16,11 +16,11 @@ class Constraint(ABC):
                  what it does and what it produces
 
         Order of operation :- [INPUT]start() -> [MODEL]model.run([INPUT]) -> [OUTPUT]complete(data)"""
-        self.name = name
-        self.flag = flag
-        self.inputs = []
-        self.model = model
-        self.output = None
+        self.name = name  # constraint name. for debugging purposes
+        self.flag = flag  # constraint's flag
+        self.inputs = []  # constraint's input(s)
+        self.model = model  # constraint's model
+        self.output = None  # constraint's output
 
     @abstractmethod
     def start(self):
