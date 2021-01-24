@@ -1,6 +1,6 @@
 from constraint import Constraint
 from flag import Flag
-from models.boolean_model import BooleanModel
+from models.example_models.boolean_model import BooleanModel
 
 
 class CombinedConstraintTest(Constraint):

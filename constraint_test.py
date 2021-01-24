@@ -1,7 +1,6 @@
 from constraint import Constraint
 from flag import Flag
-from enums.input_type import InputType
-from models.test_model import TestModel
+from models.example_models.test_model import TestModel
 
 
 class ConstrainTest(Constraint):
