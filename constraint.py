@@ -1,3 +1,4 @@
+from enums.model_family import ModelFamily
 from exception_messages import *
 from flag import Flag
 from models.model_parent import Model
@@ -21,6 +22,15 @@ class Constraint(ABC):
         self.inputs = []  # constraint's input(s)
         self.model = model  # constraint's model
         self.output = None  # constraint's output
+
+        if self.model.model_family == ModelFamily.COMBINED_CONSTRAINT:
+            self._init_constraints_in_comb_constraint()
+
+    def _init_constraints_in_comb_constraint(self):
+        """Set the properties of a constraint in a combined constraint"""
+        for constraint in self.inputs:
+            constraint.flag.set_combined(True)
+            constraint.flag.set_required(True)
 
     @abstractmethod
     def start(self):
