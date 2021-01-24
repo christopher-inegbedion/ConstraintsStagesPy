@@ -1,3 +1,4 @@
+from exception_messages import *
 from abc import ABC, abstractmethod
 from enums.model_family import ModelFamily
 from enums.input_type import InputType
@@ -33,10 +34,10 @@ class Model:
 
         # ensure the output data is the same as the required output type
         if self.output_type == InputType.INT and type(data) != int:
-            raise Exception("Invalid output type (Output type specified -> INT)")
+            raise Exception(INVALID_OUTPUT_TYPE_INT_REQUIRED)
         elif self.output_type == InputType.STRING and type(data) != str:
-            raise Exception("Invalid output type (Output type specified -> STRING)")
+            raise Exception(INVALID_OUTPUT_TYPE_STRING_REQUIRED)
         elif self.output_type == InputType.BOOL and type(data) != bool:
-            raise Exception("Invalid output type (Output type specified -> BOOL)")
+            raise Exception(INVALID_OUTPUT_TYPE_BOOL_REQUIRED)
 
         self.constraint.flag.complete_constraint()

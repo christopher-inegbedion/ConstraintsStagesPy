@@ -69,16 +69,19 @@ class Constraint(ABC):
                 raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
             else:
                 self.inputs.append(data)
+
         elif self.model.input_type == InputType.STRING:  # string input
             if type(data) != str:
                 raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
             else:
                 self.inputs.append(data)
+
         elif self.model.input_type == InputType.INT:  # int input
             if type(data) != int:
                 raise Exception(INVALID_CONSTRAINT_INPUT_INT)
             else:
                 self.inputs.append(data)
+
         elif self.model.input_type == InputType.CONSTRAINT:  # constraint input
             if data is None:
                 raise Exception(INVALID_CONSTRAINT_INPUT_CONSTRAINT)
