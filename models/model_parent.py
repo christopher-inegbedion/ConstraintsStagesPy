@@ -19,9 +19,18 @@ class Model:
         self.output_type = output_type  # the type of the output that will be returned (BOOL, INT, STRING, etc)
         self.output = None  # output produced by model
 
+        if model_family == ModelFamily.COMBINED_CONSTRAINT:
+            self.init_constraints_in_comb_constraint()
+
     def set_constraint(self, constraint):
         """Set the constraint object using the model"""
         self.constraint = constraint
+
+    def init_constraints_in_comb_constraint(self):
+        """Set the properties of a constraint in a combined constraint"""
+        for constraint in self.constraint.inputs:
+            constraint.flag.set_combined(True)
+            constraint.flag.set_required(True)
 
     @abstractmethod
     def run(self, inputs: list):
@@ -30,7 +39,7 @@ class Model:
 
     @abstractmethod
     def _complete(self, data):  # call this method last in custom models
-        """Method that ends the constraint"""
+        """Method that ends the constraint. Called from run(...) method"""
 
         # ensure the output data is the same as the required output type
         if self.output_type == InputType.INT and type(data) != int:

@@ -19,13 +19,12 @@ class TestModel(Model):
                          self.output_type)
 
     def run(self, inputs: list):
-        print(f"{self.constraint.name} model running")
-        print(f"->{inputs}")
-        time.sleep(10)
+        print(f"{self.constraint.name} constraint running")
+        # time.sleep(10)
         self._complete(inputs[0])
 
     def _complete(self, data):
-        print(f"Complete with output -> {data}")
+        print(f"\tComplete with output -> {data}")
         super()._complete(data)
 
         # print(f"{self.constraint.name}")
