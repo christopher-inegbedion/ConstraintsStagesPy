@@ -4,7 +4,7 @@ from flag import Flag
 from models.model_parent import Model
 from abc import ABC, abstractmethod
 from enums.input_type import InputType
-from enums.constraint_input_type import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputType
 
 
 class Constraint(ABC):
@@ -45,6 +45,10 @@ class Constraint(ABC):
         elif self.model.input_mode == ConstraintInputType.PRE_DEF:
             if len(self.inputs) > self.model.input_count:
                 raise Exception(INPUTS_ENTERED_MORE_THAN_REQUIRED)
+        elif self.model.input_mode == ConstraintInputType.MIXED_USER_PRE_DEF:
+            user_input = input("input: ")
+
+            self.validate_and_add_user_input(user_input)
 
         # begin the model
         self.model.run(self.inputs)
@@ -72,6 +76,9 @@ class Constraint(ABC):
             else:
                 raise Exception(INVALID_CONSTRAINT_INPUT_INT)
 
+        elif self.model.input_type == InputType.ANY:  # any input (list)
+            self.inputs.append(data)
+
     def validate_and_add_predef_input(self, data):
         """This method validates the data provided by the constraint. Used for PRE_DEF input mode."""
         if self.model.input_type == InputType.BOOL:  # bool input
@@ -98,10 +105,18 @@ class Constraint(ABC):
 
             self.inputs.append(data)
 
+        elif self.model.input_type == InputType.ANY:  # any input (list)
+            self.inputs.append(data)
+
     def add_input(self, data):
-        """Add input to the constraint. This method is only used if the input mode is PRE_DEF"""
-        # verify the input provided
-        self.validate_and_add_predef_input(data)
+        """Add input to the constraint. This method is only used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"""
+
+        if self.model.input_mode == ConstraintInputType.PRE_DEF \
+                or self.model.input_mode == ConstraintInputType.MIXED_USER_PRE_DEF:
+            # verify the input provided
+            self.validate_and_add_predef_input(data)
+        else:
+            raise Exception(MANUAL_INPUT_NOT_ALLOWED)
 
 
 
