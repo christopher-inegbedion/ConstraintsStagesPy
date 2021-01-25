@@ -113,7 +113,6 @@ class Constraint(ABC):
 
         if self.model.input_mode == ConstraintInputType.PRE_DEF \
                 or self.model.input_mode == ConstraintInputType.MIXED_USER_PRE_DEF:
-            # verify the input provided
             self.validate_and_add_predef_input(data)
         else:
             raise Exception(MANUAL_INPUT_NOT_ALLOWED)

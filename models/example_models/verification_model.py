@@ -25,7 +25,6 @@ class VerificationModel(Model):
         keywords = inputs[0]
         user_input = inputs[1]
 
-
         if user_input in keywords:
             self._complete(True)
         else:

@@ -5,9 +5,8 @@ from models.model_parent import Model
 
 
 class ConstraintInputModel(Model):
-    """A custom model. A model for combined constraints for
-     constraints that pass their outputs as input to the next constraint, excluding the
-     first constraint"""
+    """A custom model. A model for combined constraints that pass their outputs
+    as input to the next constraint, excluding the first constraint"""
 
     def __init__(self):
         self.name = "ConstraintInputModel"
@@ -23,6 +22,7 @@ class ConstraintInputModel(Model):
         super().run(inputs)
 
         print(f"{self.constraint.name} model running")
+
         # get each constraint
         constraint1 = inputs[0]
         constraint2 = inputs[1]
