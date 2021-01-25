@@ -2,7 +2,8 @@ from exception_messages import *
 from abc import ABC, abstractmethod
 from enums.model_family import ModelFamily
 from enums.input_type import InputType
-from enums.constraint_input_type import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputType
+from exception_messages import *
 
 
 class Model:
@@ -26,7 +27,8 @@ class Model:
     @abstractmethod
     def run(self, inputs: list):
         """Method that works on the input(s) provided and produces output"""
-        pass
+        if self.constraint is None:
+            raise Exception(CONSTRAINT_NOT_SET)
 
     @abstractmethod
     def _complete(self, data):  # call this method last in custom models
