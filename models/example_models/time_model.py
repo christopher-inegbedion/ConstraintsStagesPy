@@ -1,4 +1,4 @@
-from enums.constraint_input_type import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputType
 from enums.input_type import InputType
 from enums.model_family import ModelFamily
 from models.model_parent import Model
@@ -18,6 +18,8 @@ class TimeModel(Model):
         super().__init__(self.name, self.model_family, self.input_type, self.input_mode, self.input_count, self.output_type)
 
     def run(self, inputs: list):
+        super().run(inputs)
+
         print(f"{self.constraint.name} model running")
         time_ahead_from_input = inputs[0]
 

@@ -1,7 +1,7 @@
 from models.model_parent import Model
 from enums.model_family import ModelFamily
 from enums.input_type import InputType
-from enums.constraint_input_type import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputType
 import time
 
 
@@ -19,6 +19,7 @@ class BooleanModelAND(Model):
         super().__init__(self.name, self.model_family, self.input_type, self.input_mode, self.input_count, self.output_type)
 
     def run(self, inputs: list):
+        super().run(inputs)
         print(f"{self.constraint.name} model running")
         constraint1 = inputs[0]
         constraint2 = inputs[1]

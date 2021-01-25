@@ -7,3 +7,4 @@ class InputType(Enum):
     INT = "int"
     STRING = "str"
     CONSTRAINT = "constraint"
+    ANY = "any"

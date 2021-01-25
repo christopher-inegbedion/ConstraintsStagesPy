@@ -3,7 +3,7 @@ import time
 from enums.input_type import InputType
 from enums.model_family import ModelFamily
 from models.model_parent import Model
-from enums.constraint_input_type import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputType
 
 
 class TestModel(Model):
@@ -19,6 +19,8 @@ class TestModel(Model):
                          self.output_type)
 
     def run(self, inputs: list):
+        super().run(inputs)
+
         print(f"{self.constraint.name} constraint running")
         # time.sleep(10)
         self._complete(inputs[0])
