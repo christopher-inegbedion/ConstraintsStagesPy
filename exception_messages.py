@@ -11,3 +11,5 @@ INVALID_OUTPUT_TYPE_INT_REQUIRED = "Invalid output type (Output type specified i
 INVALID_OUTPUT_TYPE_BOOL_REQUIRED = "Invalid output type (Output type specified is BOOL)"
 INVALID_OUTPUT_TYPE_STRING_REQUIRED = "Invalid output type (Output type specified is STRING)"
 INVALID_OUTPUT_TYPE_CONSTRAINT_REQUIRED = "Invalid output type (Output type specified is CONSTRAINT)"
+CONSTRAINT_NOT_SET = "The model's constraint has not been set"
+MANUAL_INPUT_NOT_ALLOWED = "add_input method can only be used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"
