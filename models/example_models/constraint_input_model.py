@@ -21,8 +21,6 @@ class ConstraintInputAsOutputModel(Model):
     def run(self, inputs: list):
         super().run(inputs)
 
-        print(f"{self.constraint.name} model running")
-
         # get each constraint
         constraint1 = inputs[0]
         constraint1.start()

@@ -20,7 +20,6 @@ class BooleanModelAND(Model):
 
     def run(self, inputs: list):
         super().run(inputs)
-        print(f"{self.constraint.name} model running")
         constraint1 = inputs[0]
         constraint2 = inputs[1]
 

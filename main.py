@@ -9,7 +9,8 @@ keyword_model = KeywordModel()
 # keyword_model.set_input_count(5)
 
 constraint_input_as_output_model = ConstraintInputAsOutputModel()
-constraint_input_as_output_model.set_input_count(50)
+constraint_input_as_output_model.set_input_count(9)
+constraint_input_as_output_model.set_input_count_growable()
 
 test_constraint3 = CustomConstraint("time constraint 1", TimeModel())
 test_constraint4 = CustomConstraint("time constraint 2", TimeModel())

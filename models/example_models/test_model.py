@@ -20,8 +20,6 @@ class TestModel(Model):
 
     def run(self, inputs: list):
         super().run(inputs)
-
-        print(f"{self.constraint.name} constraint running")
         # time.sleep(10)
         self._complete(inputs[0])
 

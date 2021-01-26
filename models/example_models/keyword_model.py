@@ -20,7 +20,6 @@ class KeywordModel(Model):
     def run(self, inputs: list):
         super().run(inputs)
 
-        print(f"{self.constraint.name} model running")
         self._complete(inputs)
 
     def _complete(self, data):

@@ -20,8 +20,6 @@ class VerificationModel(Model):
     def run(self, inputs: list):
         super().run(inputs)
 
-        print(f"{self.constraint.name} model running")
-
         keywords = inputs[0]
         user_input = inputs[1]
 

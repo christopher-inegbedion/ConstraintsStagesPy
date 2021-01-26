@@ -20,7 +20,6 @@ class TimeModel(Model):
     def run(self, inputs: list):
         super().run(inputs)
 
-        print(f"{self.constraint.name} model running")
         time_ahead_from_input = inputs[0]
 
         current_time = arrow.now()
