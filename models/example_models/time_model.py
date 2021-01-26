@@ -30,8 +30,7 @@ class TimeModel(Model):
 
         self._complete(True)
 
-    def _complete(self, data):
-        print(f"\t{self.constraint.name} complete with output -> {data}")
+    def _complete(self, data, aborted=False):
         super()._complete(data)
 
 

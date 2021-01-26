@@ -28,6 +28,5 @@ class VerificationModel(Model):
         else:
             self._complete(False)
 
-    def _complete(self, data):
-        print(f"\t{self.constraint.name} complete with output -> {data}")
+    def _complete(self, data, aborted=False):
         super()._complete(data)

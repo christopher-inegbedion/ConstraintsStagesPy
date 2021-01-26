@@ -20,11 +20,8 @@ class TestModel(Model):
 
     def run(self, inputs: list):
         super().run(inputs)
-        # time.sleep(10)
+        self.abort()
         self._complete(inputs[0])
 
-    def _complete(self, data):
-        print(f"\tComplete with output -> {data}")
+    def _complete(self, data, aborted=False):
         super()._complete(data)
-
-        print()

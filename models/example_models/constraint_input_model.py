@@ -37,7 +37,6 @@ class ConstraintInputAsOutputModel(Model):
 
         self._complete(prev_constraint_val)
 
-    def _complete(self, data):
-        print(f"\t{self.constraint.name} complete with output -> {data}")
+    def _complete(self, data, aborted=False):
         super()._complete(data)
 

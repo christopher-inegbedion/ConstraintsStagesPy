@@ -40,6 +40,9 @@ class Model:
         # value can only be set for model's with a PRE_DEF input mode
         self.growable = False
 
+        # Specifies if the model has been aborted
+        self.aborted = False
+
         # Preventing incompatible input modes and types
         self._perform_input_safety_check()
 
@@ -66,10 +69,14 @@ class Model:
 
         time.sleep(seconds)
 
-    def abort(self):
+    def abort(self, msg=""):
         """Stop the constraint"""
-        self._complete(None)
-        return -1
+        if msg == "":
+            print(f"{self.name} aborted")
+        else:
+            print(msg)
+
+        self._complete(False, True)
 
     def set_input_count(self, input_count):
         """Overwrite the input count. This enables an arbitrary number of inputs to be used by a model"""
@@ -96,18 +103,29 @@ class Model:
             raise Exception(CONSTRAINT_NOT_SET)
 
     @abstractmethod
-    def _complete(self, data):  # call this method last in custom models
-        """Method that ends the constraint. Called from run(...) method"""
+    def _complete(self, data, aborted=False):
+        """Method that ends the constraint.
+        aborted argument is true if the model was aborted
 
-        # ensure the output data is the same as the required output type
-        if self.output_type == InputType.INT and type(data) != int:
-            raise Exception(INVALID_OUTPUT_TYPE_INT_REQUIRED)
-        elif self.output_type == InputType.STRING and type(data) != str:
-            raise Exception(INVALID_OUTPUT_TYPE_STRING_REQUIRED)
-        elif self.output_type == InputType.BOOL and type(data) != bool:
-            raise Exception(INVALID_OUTPUT_TYPE_BOOL_REQUIRED)
+        Called from run(...) method"""
+        print(f"\tComplete with output -> {data}")
+
+        if self.aborted:
+            self.aborted = aborted
+            self.save_output(data)
+        else:
+            # ensure the output data is the same as the required output type
+            if self.output_type == InputType.INT and type(data) != int:
+                raise Exception(INVALID_OUTPUT_TYPE_INT_REQUIRED)
+            elif self.output_type == InputType.STRING and type(data) != str:
+                raise Exception(INVALID_OUTPUT_TYPE_STRING_REQUIRED)
+            elif self.output_type == InputType.BOOL and type(data) != bool:
+                raise Exception(INVALID_OUTPUT_TYPE_BOOL_REQUIRED)
 
             # save model's output
+            self.save_output(data)
+            self.constraint.flag.complete_constraint()
+
+    def save_output(self, data):
         self.output = data
         self.constraint.output = data
-        self.constraint.flag.complete_constraint()
