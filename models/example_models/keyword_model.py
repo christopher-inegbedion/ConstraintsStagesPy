@@ -1,4 +1,4 @@
-from enums.constraint_input_mode import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputMode
 from enums.input_type import InputType
 from enums.model_family import ModelFamily
 from models.model_parent import Model
@@ -11,7 +11,7 @@ class KeywordModel(Model):
         self.name = "Keyword"
         self.model_family = ModelFamily.COMBINED_CONSTRAINT
         self.input_type = InputType.STRING
-        self.input_mode = ConstraintInputType.USER
+        self.input_mode = ConstraintInputMode.USER
         self.input_count = 3
         self.output_type = InputType.ANY
 

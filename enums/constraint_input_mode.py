@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class ConstraintInputType(Enum):
+class ConstraintInputMode(Enum):
     """This describes how the model accepts its input."""
     USER = "user"
     CONSTRAINT = "constraint"

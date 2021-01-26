@@ -1,7 +1,7 @@
 from models.model_parent import Model
 from enums.model_family import ModelFamily
 from enums.input_type import InputType
-from enums.constraint_input_mode import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputMode
 import time
 
 
@@ -12,7 +12,7 @@ class BooleanModelAND(Model):
         self.name = "BooleanAND"
         self.model_family = ModelFamily.COMBINED_CONSTRAINT
         self.input_type = InputType.CONSTRAINT
-        self.input_mode = ConstraintInputType.PRE_DEF
+        self.input_mode = ConstraintInputMode.PRE_DEF
         self.input_count = 2
         self.output_type = InputType.BOOL
 

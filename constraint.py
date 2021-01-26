@@ -4,7 +4,7 @@ from flag import Flag
 from models.model_parent import Model
 from abc import ABC, abstractmethod
 from enums.input_type import InputType
-from enums.constraint_input_mode import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputMode
 
 
 class Constraint(ABC):
@@ -17,12 +17,13 @@ class Constraint(ABC):
                  what it does and what it produces
 
         Order of operation :- [INPUT]start() -> [MODEL]model.run([INPUT]) -> [OUTPUT]complete(data)"""
-        self.name = name  # constraint name. for debugging purposes
+        self.name = name  # constraint name for debugging purposes
         self.flag = flag  # constraint's flag
         self.inputs = []  # constraint's input(s)
         self.model = model  # constraint's model
         self.output = None  # constraint's output
 
+        # initialize the flag params for the constraints in the combined constraint's constraints
         if self.model.model_family == ModelFamily.COMBINED_CONSTRAINT:
             self._init_constraints_in_comb_constraint()
 
@@ -37,18 +38,33 @@ class Constraint(ABC):
         """This method starts the constraint"""
         self.flag.start_constraint()  # initialize the constraint's flag details.
 
-        if self.model.input_mode == ConstraintInputType.USER:
+        # Accept the inputs. Before the model is run the inputs provided have
+        # to be verified for each input mode.
+        # ---------------
+
+        # Input is entered directly from the console
+        if self.model.input_mode == ConstraintInputMode.USER:
             for input_count in range(self.model.input_count):
                 user_input = input("input: ")
                 # validate and add the input provided by the user
                 self.validate_and_add_user_input(user_input)
-        elif self.model.input_mode == ConstraintInputType.PRE_DEF:
+
+        # Input is entered through the use of function calls
+        elif self.model.input_mode == ConstraintInputMode.PRE_DEF:
             if len(self.inputs) > self.model.input_count:
                 raise Exception(INPUTS_ENTERED_MORE_THAN_REQUIRED)
-        elif self.model.input_mode == ConstraintInputType.MIXED_USER_PRE_DEF:
-            user_input = input("input: ")
 
-            self.validate_and_add_user_input(user_input)
+        # Input can be entered through the console and function calls. For this
+        # input mode, the first input has to be a pre-defined value and the remaining
+        # inputs user defined (i.e from the console)
+        elif self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
+            # The first input received by the constraint is the pre-defined input
+            # and the remaining (if the input_count > 1) will be user defined.
+            if self.model.input_count > 1:
+                for input_count in range(self.model.input_count-1):
+                    user_input = input("input: ")
+
+                    self.validate_and_add_user_input(user_input)
 
         # begin the model
         self.model.run(self.inputs)
@@ -73,14 +89,47 @@ class Constraint(ABC):
             if type(data) == str:
                 if data.isnumeric():
                     self.inputs.append(int(data))
+                else:
+                    raise Exception(INVALID_CONSTRAINT_INPUT_INT)
             else:
                 raise Exception(INVALID_CONSTRAINT_INPUT_INT)
 
-        elif self.model.input_type == InputType.ANY:  # any input (list)
+        elif self.model.input_type == InputType.LIST_AND_BOOL:  # a list and bool combination
+            # This type of input can only be used if the input mode of the model is mixed.
+            # The first input is a list with some values and the remaining inputs will be booleans
+
+            # ensure that the first input has been entered before the console input is entered
+            if self.inputs == []:
+                raise Exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
+
             self.inputs.append(data)
+        elif self.model.input_type == InputType.LIST_AND_STRING:  # a list and bool combination
+            # This type of input can only be used if the input mode of the model is mixed.
+            # The first input is a list with some values and the remaining inputs will be booleans
+
+            # ensure that the first input has been entered before the console input is entered
+            if self.inputs == []:
+                raise Exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
+
+            self.inputs.append(data)
+        elif self.model.input_type == InputType.LIST_AND_INT:  # a list and bool combination
+            # This type of input can only be used if the input mode of the model is mixed.
+            # The first input is a list with some values and the remaining inputs will be ints
+
+            # ensure that the first input has been entered before the console input is entered
+            if self.inputs == []:
+                raise Exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
+
+            self.inputs.append(data)
+        elif self.model.input_type == InputType.LIST_AND_CONSTRAINT:  # a list and bool combination
+            # This type of input can only be used if the input mode of the model is mixed.
+
+            # A constraint cannot be entered through the console
+            pass
 
     def validate_and_add_predef_input(self, data):
-        """This method validates the data provided by the constraint. Used for PRE_DEF input mode."""
+        """This method validates the pre-defined data provided through function calls to the constraint.
+         Used for PRE_DEF input mode."""
         if self.model.input_type == InputType.BOOL:  # bool input
             if type(data) != bool:
                 raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
@@ -108,14 +157,58 @@ class Constraint(ABC):
         elif self.model.input_type == InputType.ANY:  # any input (list)
             self.inputs.append(data)
 
+        # combined input types
+        # --------------------
+        elif self.model.input_type == InputType.LIST_AND_BOOL:  # a list and bool combination
+            # This type of input can only be used if the input mode of the model is mixed.
+            # The first input is a list with some values and the remaining inputs will be booleans
+
+            # ensure that only a single pre-defined input can be stored
+            if len(self.inputs) == 1:
+                raise Exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
+            elif type(data) != list:
+                raise Exception(MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
+
+            self.inputs.append(data)
+        elif self.model.input_type == InputType.LIST_AND_STRING:  # a list and bool combination
+            # This type of input can only be used if the input mode of the model is mixed.
+            # The first input is a list with some values and the remaining inputs will be booleans
+
+            # ensure that only a single pre-defined input can be stored
+            if len(self.inputs) == 1:
+                raise Exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
+            elif type(data) != list:
+                raise Exception(MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
+
+            self.inputs.append(data)
+        elif self.model.input_type == InputType.LIST_AND_INT:  # a list and bool combination
+            # This type of input can only be used if the input mode of the model is mixed.
+            # The first input is a list with some values and the remaining inputs will be ints
+
+            # ensure that only a single pre-defined input can be stored
+            if len(self.inputs) == 1:
+                raise Exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
+            elif type(data) != list:
+                raise Exception(MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
+
+            self.inputs.append(data)
+        elif self.model.input_type == InputType.LIST_AND_CONSTRAINT:  # a list and bool combination
+            # This type of input can only be used if the input mode of the model is mixed.
+            # The first input is a list with some values and the remaining inputs will be constraint
+
+            # ensure that only a single pre-defined input can be stored
+            if len(self.inputs) == 1:
+                raise Exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
+            elif type(data) != list:
+                raise Exception(MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
+
+            self.inputs.append(data)
+
     def add_input(self, data):
         """Add input to the constraint. This method is only used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"""
 
-        if self.model.input_mode == ConstraintInputType.PRE_DEF \
-                or self.model.input_mode == ConstraintInputType.MIXED_USER_PRE_DEF:
+        if self.model.input_mode == ConstraintInputMode.PRE_DEF \
+                or self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
             self.validate_and_add_predef_input(data)
         else:
             raise Exception(MANUAL_INPUT_NOT_ALLOWED)
-
-
-
