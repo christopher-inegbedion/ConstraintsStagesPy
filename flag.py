@@ -1,13 +1,14 @@
 import time
+from enums.constraint_status import ConstraintStatus
 
 
 class Flag:
     """The flag describes a constraints properties"""
-    def __init__(self, name: str, started: bool, start_time: int, end_time: int, required: bool, combined: bool,
+    def __init__(self, name: str, status: ConstraintStatus, start_time: int, end_time: int, required: bool, combined: bool,
                  prev_constraint_id: str,
                  next_constraint_id: str):
         self.name = name  # flag name tag
-        self.started = started  # defines if the constraint has begun
+        self.status = status  # defines the status of the constraint (Active, Complete, etc)
         self.start_time = start_time  # a UNIX timestamp from when the constraint begun
         self.end_time = end_time  # a UNIX timestamp from when the constraint completes
         self.required = required  # defines if the constraint is required in a stage. This property is only useful for
@@ -18,11 +19,12 @@ class Flag:
 
     def start_constraint(self):
         """Called when a constraint is begun"""
-        self.started = True
+        self.status = ConstraintStatus.ACTIVE
         self._set_start_time()
 
     def complete_constraint(self):
         """Called when a constraint is completed"""
+        self.status = ConstraintStatus.COMPLETE
         self._set_end_time()
 
     def _set_start_time(self):
