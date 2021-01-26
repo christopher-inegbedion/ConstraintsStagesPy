@@ -38,7 +38,7 @@ class Model:
             raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
 
     def set_input_count(self, input_count):
-        """Overwrite the input count"""
+        """Overwrite the input count. This enables an arbitrary number of inputs to be used by a model"""
         self.input_count = input_count
 
     def set_constraint(self, constraint):
