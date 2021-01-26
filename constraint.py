@@ -37,6 +37,7 @@ class Constraint(ABC):
     def start(self):
         """This method starts the constraint"""
         self.flag.start_constraint()  # initialize the constraint's flag details.
+        print(f"{self.name} model running")
 
         # Accept the inputs. Before the model is run the inputs provided have
         # to be verified for each input mode.
@@ -51,8 +52,14 @@ class Constraint(ABC):
 
         # Input is entered through the use of function calls
         elif self.model.input_mode == ConstraintInputMode.PRE_DEF:
-            if len(self.inputs) > self.model.input_count:
-                raise Exception(INPUTS_ENTERED_MORE_THAN_REQUIRED)
+            # Some models can be set as growable, and thus multiple function calls to add an input
+            # can be called that are less or more than the model's pre-set input count
+            if self.model.growable:
+                input_count = len(self.inputs)
+                self.model.input_count = input_count
+            else:
+                if len(self.inputs) > self.model.input_count or len(self.inputs) < self.model.input_count:
+                    raise Exception(INPUTS_ENTERED_MORE_THAN_REQUIRED)
 
         # Input can be entered through the console and function calls. For this
         # input mode, the first input has to be a pre-defined value and the remaining
