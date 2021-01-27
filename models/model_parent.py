@@ -182,9 +182,9 @@ class Model:
     @abstractmethod
     def _complete(self, data, aborted=False):
         """Method that ends the constraint.
-        aborted argument is true if the model was aborted
+        'aborted' argument is True if the model was aborted
 
-        Called from run(...) method"""
+        This method is called from run(...) method"""
         print(f"\tComplete with output -> {data}")
 
         if self.aborted:
