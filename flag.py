@@ -4,18 +4,36 @@ from enums.constraint_status import ConstraintStatus
 
 class Flag:
     """The flag describes a constraints properties"""
-    def __init__(self, name: str, status: ConstraintStatus, start_time: int, end_time: int, required: bool, combined: bool,
+    def __init__(self, name: str, status: ConstraintStatus, initial_input_required: bool, required: bool, combined: bool,
                  prev_constraint_id: str,
                  next_constraint_id: str):
         self.name = name  # flag name tag
-        self.status = status  # defines the status of the constraint (Active, Complete, etc)
-        self.start_time = start_time  # a UNIX timestamp from when the constraint begun
-        self.end_time = end_time  # a UNIX timestamp from when the constraint completes
-        self.required = required  # defines if the constraint is required in a stage. This property is only useful for
+
+        # defines the status of the constraint (Active, Complete, etc)
+        self.status = status
+
+        # a UNIX timestamp from when the constraint begun
+        self.start_time = 0
+
+        # a UNIX timestamp from when the constraint completes
+        self.end_time = 0
+
+        # Defines if the constraint is required in a stage. This property is only useful for
         # constraints with a USER input mode
-        self.combined = combined  # this value defines if a constraint is combined
-        self.prev_constraint_id = prev_constraint_id  # the ID of the previous constraint
-        self.next_constraint_id = next_constraint_id  # the ID of the next constraint
+        self.required = required
+
+        # this value defines if a constraint is combined
+        self.combined = combined
+
+        # Defines if initial input is required. If this field's value is true, then the input count
+        # value for the constraint's model is ignored and the input is entered on request of the model
+        self.initial_input_required = initial_input_required
+
+        # the ID of the previous constraint
+        self.prev_constraint_id = prev_constraint_id
+
+        # the ID of the next constraint
+        self.next_constraint_id = next_constraint_id
 
     def start_constraint(self):
         """Called when a constraint is begun"""
@@ -42,6 +60,9 @@ class Flag:
     def set_combined(self, combined: bool):
         """Set the constraint as combined. Method used by the model"""
         self.combined = combined
+
+    def set_initial_input_required(self, required: bool):
+        """Set whether or not initial input is required"""
 
     def set_prev_constraint_id(self, prev_constraint_id: str):
         """Set the previous constraint ID. Method used by the stage"""

@@ -35,43 +35,44 @@ class Constraint(ABC):
 
     @abstractmethod
     def start(self):
-        """This method starts the constraint"""
+        """This method starts the constraint. This is where the inputs are retrieved and passed to the model"""
         self.flag.start_constraint()  # initialize the constraint's flag details.
         print(f"{self.name} model running")
 
-        # Accept the inputs. Before the model is run the inputs provided have
-        # to be verified for each input mode.
-        # ---------------
+        if self.model.initial_input_required:
+            # Accept the inputs. Before the model is run the inputs provided have
+            # to be verified for each input mode.
+            # ---------------
 
-        # Input is entered directly from the console
-        if self.model.input_mode == ConstraintInputMode.USER:
-            for input_count in range(self.model.input_count):
-                user_input = input("input: ")
-                # validate and add the input provided by the user
-                self.validate_and_add_user_input(user_input)
-
-        # Input is entered through the use of function calls
-        elif self.model.input_mode == ConstraintInputMode.PRE_DEF:
-            # Some models can be set as growable, and thus multiple function calls to add an input
-            # can be called that are less or more than the model's pre-set input count
-            if self.model.growable:
-                input_count = len(self.inputs)
-                self.model.input_count = input_count
-            else:
-                if len(self.inputs) > self.model.input_count or len(self.inputs) < self.model.input_count:
-                    raise Exception(INPUTS_ENTERED_MORE_THAN_REQUIRED)
-
-        # Input can be entered through the console and function calls. For this
-        # input mode, the first input has to be a pre-defined value and the remaining
-        # inputs user defined (i.e from the console)
-        elif self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
-            # The first input received by the constraint is the pre-defined input
-            # and the remaining (if the input_count > 1) will be user defined.
-            if self.model.input_count > 1:
-                for input_count in range(self.model.input_count-1):
+            # Input is entered directly from the console
+            if self.model.input_mode == ConstraintInputMode.USER:
+                for input_count in range(self.model.input_count):
                     user_input = input("input: ")
-
+                    # validate and add the input provided by the user
                     self.validate_and_add_user_input(user_input)
+
+            # Input is entered through the use of function calls
+            elif self.model.input_mode == ConstraintInputMode.PRE_DEF:
+                # Some models can be set as growable, and thus multiple function calls to add an input
+                # can be called that are less or more than the model's pre-set input count
+                if self.model.growable:
+                    input_count = len(self.inputs)
+                    self.model.input_count = input_count
+                else:
+                    if len(self.inputs) > self.model.input_count or len(self.inputs) < self.model.input_count:
+                        raise Exception(INPUTS_ENTERED_MORE_THAN_REQUIRED)
+
+            # Input can be entered through the console and function calls. For this
+            # input mode, the first input has to be a pre-defined value and the remaining
+            # inputs user defined (i.e from the console)
+            elif self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
+                # The first input received by the constraint is the pre-defined input
+                # and the remaining (if the input_count > 1) will be user defined.
+                if self.model.input_count > 1:
+                    for input_count in range(self.model.input_count-1):
+                        user_input = input("input: ")
+
+                        self.validate_and_add_user_input(user_input)
 
         # begin the model
         self.model.run(self.inputs)
@@ -214,8 +215,9 @@ class Constraint(ABC):
     def add_input(self, data):
         """Add input to the constraint. This method is only used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"""
 
-        if self.model.input_mode == ConstraintInputMode.PRE_DEF \
-                or self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
-            self.validate_and_add_predef_input(data)
-        else:
-            raise Exception(MANUAL_INPUT_NOT_ALLOWED)
+        if self.model.initial_input_required:
+            if self.model.input_mode == ConstraintInputMode.PRE_DEF \
+                    or self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
+                self.validate_and_add_predef_input(data)
+            else:
+                raise Exception(MANUAL_INPUT_NOT_ALLOWED)

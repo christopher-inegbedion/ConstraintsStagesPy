@@ -1,4 +1,5 @@
 from constraint import Constraint
+from enums.constraint_status import ConstraintStatus
 from flag import Flag
 
 
@@ -16,7 +17,7 @@ class CustomConstraint(Constraint):
         if flag is not None:
             self.flag = flag
         else:
-            self.flag = Flag("ConstraintVerification", False, 0, 0, False, False, "", "")
+            self.flag = Flag("ConstraintVerification", ConstraintStatus.NOT_STARTED, False, False, False, "", "")
 
         super().__init__(self.name, self.flag, self.model)
         self.model.set_constraint(self)

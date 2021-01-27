@@ -1,3 +1,4 @@
+from enums.constraint_status import ConstraintStatus
 from exception_messages import *
 from abc import ABC, abstractmethod
 from enums.model_family import ModelFamily
@@ -10,7 +11,7 @@ import time
 class Model:
     def __init__(self, name: str, model_family: ModelFamily, input_type: InputType,
                  input_mode: ConstraintInputMode,
-                 input_count: int, output_type):
+                 input_count: int, output_type, initial_input_required=True):
         """Abstract model class"""
         # the constraint that is utilizing the model
         self.constraint = None
@@ -20,6 +21,10 @@ class Model:
 
         # value to determine if the model is for a combined constraint or a normal one
         self.model_family = model_family
+
+        # Determines if initial value input is required. A false value means the input_count param
+        # is ignored by the model.
+        self.initial_input_required = initial_input_required
 
         # the type of input the model requires (CONSTRAINT, BOOL, INT, etc)
         self.input_type = input_type
@@ -46,35 +51,90 @@ class Model:
         # Preventing incompatible input modes and types
         self._perform_input_safety_check()
 
-    def _perform_input_safety_check(self):
-        """This method ensures that certain input type and mode combinations are not permitted.
-
-        A model with input mode other than MIXED_USER_PRE_DEF cannot have an input type of
-        LIST_AND_BOOL, LIST_AND_INT, etc"""
-        if self.input_type == InputType.LIST_AND_BOOL and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
-            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
-        if self.input_type == InputType.LIST_AND_CONSTRAINT and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
-            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
-        if self.input_type == InputType.LIST_AND_INT and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
-            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
-        if self.input_type == InputType.LIST_AND_STRING and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
-            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
-
     # Utility methods
     # ---------------
+    def validate_and_add_user_input(self, data):
+        """This method validates the data provided by the constraint user. Used for USER input mode.
+
+        Combined input types (e.g LIST_AND_BOOL, LIST_AND_INT, etc) cannot be inputted with this function"""
+
+        if self.input_type == InputType.BOOL:  # boolean input
+            if data.lower() == "true":
+                return True
+            elif data.lower() == "false":
+                return False
+            else:
+                raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
+
+        elif self.input_type == InputType.STRING:  # string input
+            if data.isspace():
+                raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
+
+            return data
+
+        elif self.input_type == InputType.INT:  # int input
+            if type(data) == str:
+                if data.isnumeric():
+                    return int(data)
+                else:
+                    raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+            else:
+                raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+
+    def validate_and_add_pre_def_input(self, data):
+        """This method validates the pre-defined data provided through function calls to the constraint.
+                 Used for PRE_DEF input mode."""
+        if self.input_type == InputType.BOOL:  # bool input
+            if type(data) != bool:
+                raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
+            else:
+                return data
+
+        elif self.input_type == InputType.STRING:  # string input
+            if type(data) != str:
+                raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
+            else:
+                return data
+
+        elif self.input_type == InputType.INT:  # int input
+            if type(data) != int:
+                raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+            else:
+                return data
+
+        elif self.input_type == InputType.CONSTRAINT:  # constraint input
+            if data is None:
+                raise Exception(INVALID_CONSTRAINT_INPUT_CONSTRAINT)
+
+            return data
+
+        elif self.input_type == InputType.ANY:  # any input (list)
+            return data
+
+    def request_input(self, data=None):
+        """Request input from the user"""
+        if data is None:
+            user_input = input("input: ")
+            return self.validate_and_add_user_input(user_input)
+        else:
+            user_input = data
+            return self.validate_and_add_pre_def_input(user_input)
+
     def pause(self, seconds):
         """Pause the threads by the seconds arg."""
         if type(seconds) != int:
             raise Exception("Invalid argument type passed (int type required)")
 
-        time.sleep(seconds)
+        if self.constraint.flag.status == ConstraintStatus.ACTIVE:
+            time.sleep(seconds)
 
     def abort(self, msg=""):
         """Stop the constraint"""
-        if msg == "":
-            print(f"{self.name} aborted")
-        else:
-            print(msg)
+        if self.constraint.flag.status == ConstraintStatus.ACTIVE:
+            if msg == "":
+                print(f"{self.name} aborted")
+            else:
+                print(msg)
 
         self._complete(False, True)
 
@@ -91,9 +151,26 @@ class Model:
 
     # ------------------
 
+    def _perform_input_safety_check(self):
+        """This method ensures that certain input type and mode combinations are not permitted.
+
+        A model with input mode other than MIXED_USER_PRE_DEF cannot have an input type of
+        LIST_AND_BOOL, LIST_AND_INT, etc"""
+        if self.input_type == InputType.LIST_AND_BOOL and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
+            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
+        if self.input_type == InputType.LIST_AND_CONSTRAINT and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
+            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
+        if self.input_type == InputType.LIST_AND_INT and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
+            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
+        if self.input_type == InputType.LIST_AND_STRING and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
+            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
+
     def set_constraint(self, constraint):
         """Set the constraint object using the model"""
         self.constraint = constraint
+
+        # edit the constraint's flag's parameters
+        self.constraint.flag.initial_input_required = self.initial_input_required
 
     @abstractmethod
     def run(self, inputs: list):
