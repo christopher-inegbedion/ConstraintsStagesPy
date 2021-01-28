@@ -1,25 +1,25 @@
 from models.model_parent import Model
 from enums.model_family import ModelFamily
 from enums.input_type import InputType
-from enums.constraint_input_type import ConstraintInputType
+from enums.constraint_input_mode import ConstraintInputMode
 import time
 
 
-class BooleanModel(Model):
+class BooleanModelAND(Model):
     """A custom model"""
 
     def __init__(self) -> None:
-        self.name = "Boolean"
+        self.name = "BooleanAND"
         self.model_family = ModelFamily.COMBINED_CONSTRAINT
         self.input_type = InputType.CONSTRAINT
-        self.input_mode = ConstraintInputType.PRE_DEF
+        self.input_mode = ConstraintInputMode.PRE_DEF
         self.input_count = 2
         self.output_type = InputType.BOOL
 
         super().__init__(self.name, self.model_family, self.input_type, self.input_mode, self.input_count, self.output_type)
 
     def run(self, inputs: list):
-        print(f"{self.constraint.name} model running")
+        super().run(inputs)
         constraint1 = inputs[0]
         constraint2 = inputs[1]
 
@@ -32,9 +32,6 @@ class BooleanModel(Model):
 
         self._complete(return_val)
 
-    def _complete(self, data):
-        print(f"{self.constraint.name} complete with output -> {data}")
+    def _complete(self, data, aborted=False):
         super()._complete(data)
 
-        self.output = data
-        self.constraint.output = data
