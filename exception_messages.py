@@ -18,3 +18,5 @@ INVALID_OUTPUT_TYPE_CONSTRAINT_REQUIRED = "Invalid output type (Output type spec
 CONSTRAINT_NOT_SET = "The model's constraint has not been set"
 MANUAL_INPUT_NOT_ALLOWED = "add_input method can only be used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"
 INCOMPATIBLE_INPUT_TYPE_AND_MODE = "The input type and input mode chosen for the model are not compatible"
+INITIAL_INPUT_REQUIRED_FOR_COMBINED_CONSTRAINT = "A constraint passed to the combined constraint does not have " \
+                                                  "initial input enabled."

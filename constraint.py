@@ -68,7 +68,7 @@ class Constraint(ABC):
             elif self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
                 # The first input received by the constraint is the pre-defined input
                 # and the remaining (if the input_count > 1) will be user defined.
-                if self.model.input_count > 1:
+                if self.model.input_count-1 >= 1:
                     for input_count in range(self.model.input_count-1):
                         user_input = input("input: ")
 

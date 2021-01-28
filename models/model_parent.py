@@ -151,11 +151,28 @@ class Model:
 
     # ------------------
 
+    def check_constraint_initial_input_enabled(self, data):
+        """This method ensures that the constraints used by a combined constraint model have initial
+        input enabled"""
+        # constraints can only be inputted into a model through function calls
+
+        # Ensure constraints have initial input enabled if used by a combined constraint model
+        if self.model_family == ModelFamily.COMBINED_CONSTRAINT:
+            for constraint in data:
+                if constraint.model.initial_input_required is not True:
+                    raise Exception(INITIAL_INPUT_REQUIRED_FOR_COMBINED_CONSTRAINT)
+
     def _perform_input_safety_check(self):
         """This method ensures that certain input type and mode combinations are not permitted.
 
+        This method ensures that the constraints in a combined constraint must have initial input
+        enabled.
+
         A model with input mode other than MIXED_USER_PRE_DEF cannot have an input type of
         LIST_AND_BOOL, LIST_AND_INT, etc"""
+
+
+        # Ensure input type and mode combinations are correct
         if self.input_type == InputType.LIST_AND_BOOL and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
             raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
         if self.input_type == InputType.LIST_AND_CONSTRAINT and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
@@ -175,6 +192,8 @@ class Model:
     @abstractmethod
     def run(self, inputs: list):
         """Method that works on the input(s) provided and produces output"""
+        # performs a check for combined constraint models to ensure their constraint's have initial input enabled
+        self.check_constraint_initial_input_enabled(inputs)
 
         if self.constraint is None:
             raise Exception(CONSTRAINT_NOT_SET)
