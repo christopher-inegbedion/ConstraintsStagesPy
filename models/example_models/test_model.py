@@ -10,7 +10,7 @@ class TestModel(Model):
     def __init__(self):
         self.name = "test"
         self.model_family = ModelFamily.CONSTRAINT
-        self.initial_input_required = False
+        self.initial_input_required = True
         self.input_type = InputType.INT
         self.input_mode = ConstraintInputMode.MIXED_USER_PRE_DEF
         self.input_count = 1
@@ -21,10 +21,10 @@ class TestModel(Model):
 
     def run(self, inputs: list):
         super().run(inputs)
-        # self.pause(10)
+        # self.abort()
 
         # input1 = self.request_input()
         self._complete(inputs[0])
 
     def _complete(self, data, aborted=False):
-        super()._complete(data)
+        super()._complete(data, aborted)

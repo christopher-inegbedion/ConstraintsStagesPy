@@ -132,11 +132,11 @@ class Model:
         """Stop the constraint"""
         if self.constraint.flag.status == ConstraintStatus.ACTIVE:
             if msg == "":
-                print(f"{self.name} aborted")
+                print(f"(x) MODEL: {self.name} aborted (x)")
             else:
                 print(msg)
 
-        self._complete(False, True)
+        self._complete(None, True)
 
     def set_input_count(self, input_count):
         """Overwrite the input count. This enables an arbitrary number of inputs to be used by a model"""
@@ -192,8 +192,8 @@ class Model:
     @abstractmethod
     def run(self, inputs: list):
         """Method that works on the input(s) provided and produces output"""
-        print(f"MODEL: {self.name} model running (Required input type: {self.input_type}, "
-              f"Output type: {self.output_type}")
+        print(f"\tMODEL: {self.name} model running (Required input type: {self.input_type}, "
+              f"Output type: {self.output_type})")
 
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
         self.check_constraint_initial_input_enabled(inputs)
@@ -207,13 +207,13 @@ class Model:
         'aborted' argument is True if the model was aborted
 
         This method is called from run(...) method"""
-        print(f"MODEL: {self.name} model complete with output -> {data}")
-        print()
-
-        if self.aborted:
+        if aborted or self.aborted:
             self.aborted = aborted
             self.save_output(data)
         else:
+            print(f"\tMODEL: {self.name} model complete with output -> {data} ({self.constraint.name})")
+            print()
+
             # ensure the output data is the same as the required output type
             if self.output_type == InputType.INT and type(data) != int:
                 raise Exception(INVALID_OUTPUT_TYPE_INT_REQUIRED)

@@ -38,6 +38,7 @@ from models.example_models.verification_model import VerificationModel
 # test_constraint_1 = CustomConstraint("test constraint", TestModel())
 # test_constraint_1.add_input(False)
 # test_constraint_1.start()
+from stage import Stage, StageGroup
 
 constraint1 = CustomConstraint("test1", TestModel())
 constraint1.add_input(4)
@@ -46,4 +47,14 @@ constraint2 = CustomConstraint("test2", TestModel())
 combined_constraint = CustomConstraint("combined constraint", TestCombinedConstraintModel())
 combined_constraint.add_input(constraint1)
 combined_constraint.add_input(constraint2)
-combined_constraint.start()
+
+stage = Stage("stage 1")
+stage.add_constraint(combined_constraint)
+
+stage2 = Stage("stage 2")
+stage2.add_constraint(combined_constraint)
+
+stage_group = StageGroup()
+stage_group.add_stage(stage)
+stage_group.add_stage(stage2)
+stage_group.start()
