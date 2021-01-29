@@ -192,6 +192,9 @@ class Model:
     @abstractmethod
     def run(self, inputs: list):
         """Method that works on the input(s) provided and produces output"""
+        print(f"MODEL: {self.name} model running (Required input type: {self.input_type}, "
+              f"Output type: {self.output_type}")
+
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
         self.check_constraint_initial_input_enabled(inputs)
 
@@ -204,7 +207,8 @@ class Model:
         'aborted' argument is True if the model was aborted
 
         This method is called from run(...) method"""
-        print(f"\tComplete with output -> {data}")
+        print(f"MODEL: {self.name} model complete with output -> {data}")
+        print()
 
         if self.aborted:
             self.aborted = aborted

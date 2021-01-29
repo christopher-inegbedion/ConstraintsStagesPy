@@ -9,6 +9,7 @@ CONSTRAINT_INPUT_ORDER_MISMATCH = "Inputs entered in wrong order (The pre-define
                                   "then any user defined inputs)"
 PRE_DEF_INPUTS_ALREADY_EXISTING = "Pre-defined inputs have already entered"
 MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST = "First input for MIXED_USER_PREF mode must be a list"
+INITIAL_INPUT_NOT_ENABLED = "Data cannot be passed to the model. Initial input is not enabled"
 
 # MODEL
 INVALID_OUTPUT_TYPE_INT_REQUIRED = "Invalid output type (Output type specified is INT)"

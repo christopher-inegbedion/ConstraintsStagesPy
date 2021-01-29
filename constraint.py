@@ -37,7 +37,7 @@ class Constraint(ABC):
     def start(self):
         """This method starts the constraint. This is where the inputs are retrieved and passed to the model"""
         self.flag.start_constraint()  # initialize the constraint's flag details.
-        print(f"{self.name} model running")
+        print(f"CONSTRAINT: {self.name} model running")
 
         if self.model.initial_input_required:
             # Accept the inputs. Before the model is run the inputs provided have
@@ -221,3 +221,5 @@ class Constraint(ABC):
                 self.validate_and_add_predef_input(data)
             else:
                 raise Exception(MANUAL_INPUT_NOT_ALLOWED)
+        else:
+            raise Exception(INITIAL_INPUT_NOT_ENABLED)
