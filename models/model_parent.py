@@ -192,7 +192,8 @@ class Model:
     @abstractmethod
     def run(self, inputs: list):
         """Method that works on the input(s) provided and produces output"""
-        print(f"\tMODEL: {self.name} model running (Required input type: {self.input_type}, "
+        if self.constraint.debug:
+            print(f"\tMODEL: {self.name} model running (Required input type: {self.input_type}, "
               f"Output type: {self.output_type})")
 
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
@@ -211,8 +212,9 @@ class Model:
             self.aborted = aborted
             self.save_output(data)
         else:
-            print(f"\tMODEL: {self.name} model complete with output -> {data} ({self.constraint.name})")
-            print()
+            if self.constraint.debug:
+                print(f"\tMODEL: {self.name} model complete with output -> {data} ({self.constraint.name})")
+                print()
 
             # ensure the output data is the same as the required output type
             if self.output_type == InputType.INT and type(data) != int:

@@ -9,7 +9,7 @@ from enums.constraint_input_mode import ConstraintInputMode
 
 class Constraint(ABC):
     """Abstract constraint class"""
-    def __init__(self, name: str, flag: Flag, model: Model):
+    def __init__(self, name: str, flag: Flag, model: Model, debug=False):
         """Each constraint has a flag and model
 
         Flag :- The flag defines the properties for the constraint
@@ -22,6 +22,7 @@ class Constraint(ABC):
         self.inputs = []  # constraint's input(s)
         self.model = model  # constraint's model
         self.output = None  # constraint's output
+        self.debug = debug  # determines if debug messages will be displayed
 
         # initialize the flag params for the constraints in the combined constraint's constraints
         if self.model.model_family == ModelFamily.COMBINED_CONSTRAINT:
@@ -37,7 +38,9 @@ class Constraint(ABC):
     def start(self):
         """This method starts the constraint. This is where the inputs are retrieved and passed to the model"""
         self.flag.start_constraint()  # initialize the constraint's flag details.
-        print(f"CONSTRAINT: {self.name} running")
+
+        if self.debug:
+            print(f"CONSTRAINT: {self.name} running")
 
         if self.model.initial_input_required:
             # Accept the inputs. Before the model is run the inputs provided have
@@ -60,7 +63,7 @@ class Constraint(ABC):
                     self.model.input_count = input_count
                 else:
                     if len(self.inputs) > self.model.input_count or len(self.inputs) < self.model.input_count:
-                        raise Exception(INPUTS_ENTERED_MORE_THAN_REQUIRED)
+                        raise Exception(INSUFFICIENT_AMOUNT_OF_INPUTS_ENTERED)
 
             # Input can be entered through the console and function calls. For this
             # input mode, the first input has to be a pre-defined value and the remaining

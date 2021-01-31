@@ -1,5 +1,5 @@
 # Constraint
-INPUTS_ENTERED_MORE_THAN_REQUIRED = "Input(s) entered not equal to required number of inputs"
+INSUFFICIENT_AMOUNT_OF_INPUTS_ENTERED = "Input(s) entered not equal to required number of inputs"
 
 INVALID_CONSTRAINT_INPUT_INT = "Invalid constraint input (INT type required)"
 INVALID_CONSTRAINT_INPUT_BOOL = "Invalid constraint input (BOOL type required)"
