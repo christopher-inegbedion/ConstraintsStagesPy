@@ -6,6 +6,7 @@ from enums.input_type import InputType
 from enums.constraint_input_mode import ConstraintInputMode
 from exception_messages import *
 import time
+import logging
 
 
 class Model:
@@ -193,7 +194,10 @@ class Model:
     def run(self, inputs: list):
         """Method that works on the input(s) provided and produces output"""
         if self.constraint.debug:
-            print(f"\tMODEL: {self.name} model running (Required input type: {self.input_type}, "
+            logging.basicConfig(
+                level=logging.DEBUG)
+
+            logging.debug(f"[MODEL]: {self.name} model running (Required input type: {self.input_type}, "
               f"Output type: {self.output_type})")
 
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
@@ -213,7 +217,7 @@ class Model:
             self.save_output(data)
         else:
             if self.constraint.debug:
-                print(f"\tMODEL: {self.name} model complete with output -> {data} ({self.constraint.name})")
+                logging.debug(f"[MODEL]: {self.name} model complete with output -> {data} ({self.constraint.name})")
                 print()
 
             # ensure the output data is the same as the required output type

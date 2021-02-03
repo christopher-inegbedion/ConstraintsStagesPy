@@ -1,3 +1,4 @@
+from enums.constraint_status import ConstraintStatus
 from enums.model_family import ModelFamily
 from exception_messages import *
 from flag import Flag
@@ -5,7 +6,7 @@ from models.model_parent import Model
 from abc import ABC, abstractmethod
 from enums.input_type import InputType
 from enums.constraint_input_mode import ConstraintInputMode
-
+import logging
 
 class Constraint(ABC):
     """Abstract constraint class"""
@@ -24,9 +25,18 @@ class Constraint(ABC):
         self.output = None  # constraint's output
         self.debug = debug  # determines if debug messages will be displayed
 
+        # support for providing custom flags
+        if flag is not None:
+            self.flag = flag
+        else:
+            self.flag = Flag("ConstraintVerification", ConstraintStatus.NOT_STARTED, False, False, False, "", "")
+
         # initialize the flag params for the constraints in the combined constraint's constraints
         if self.model.model_family == ModelFamily.COMBINED_CONSTRAINT:
             self._init_constraints_in_comb_constraint()
+
+        self.model.set_constraint(self)
+
 
     def _init_constraints_in_comb_constraint(self):
         """Set the properties of a constraint in a combined constraint"""
@@ -40,7 +50,8 @@ class Constraint(ABC):
         self.flag.start_constraint()  # initialize the constraint's flag details.
 
         if self.debug:
-            print(f"CONSTRAINT: {self.name} running")
+            logging.basicConfig(level=logging.DEBUG)
+            logging.debug(f"[CONSTRAINT]: {self.name} running")
 
         if self.model.initial_input_required:
             # Accept the inputs. Before the model is run the inputs provided have

@@ -44,7 +44,8 @@ constraint1 = CustomConstraint("test1", TestModel())
 constraint1.add_input(4)
 constraint2 = CustomConstraint("test2", TestModel())
 
-combined_constraint = CustomConstraint("combined constraint", TestCombinedConstraintModel())
+combined_constraint = CustomConstraint(
+    "combined constraint", TestCombinedConstraintModel(), debug=True)
 combined_constraint.add_input(constraint1)
 combined_constraint.add_input(constraint2)
 
