@@ -1,4 +1,4 @@
-from constraint_examples.custom_constraint import CustomConstraint
+from constraint.custom_constraint import CustomConstraint
 from models.example_models.boolean_model_and import BooleanModelAND
 from models.example_models.constraint_input_model import ConstraintInputAsOutputModel
 from models.example_models.keyword_model import KeywordModel
@@ -6,6 +6,7 @@ from models.example_models.test_combined_constraint import TestCombinedConstrain
 from models.example_models.test_model import TestModel
 from models.example_models.time_model import TimeModel
 from models.example_models.verification_model import VerificationModel
+from stage.stage import Stage, StageGroup
 
 # keyword_model = KeywordModel()
 # keyword_model.set_input_count(5)
@@ -38,7 +39,6 @@ from models.example_models.verification_model import VerificationModel
 # test_constraint_1 = CustomConstraint("test constraint", TestModel())
 # test_constraint_1.add_input(False)
 # test_constraint_1.start()
-from stage import Stage, StageGroup
 
 constraint1 = CustomConstraint("test1", TestModel())
 constraint1.add_input(4)

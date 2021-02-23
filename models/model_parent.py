@@ -161,7 +161,8 @@ class Model:
         if self.model_family == ModelFamily.COMBINED_CONSTRAINT:
             for constraint in data:
                 if constraint.model.initial_input_required is not True:
-                    raise Exception(INITIAL_INPUT_REQUIRED_FOR_COMBINED_CONSTRAINT)
+                    raise Exception(
+                        INITIAL_INPUT_REQUIRED_FOR_COMBINED_CONSTRAINT)
 
     def _perform_input_safety_check(self):
         """This method ensures that certain input type and mode combinations are not permitted.
@@ -171,7 +172,6 @@ class Model:
 
         A model with input mode other than MIXED_USER_PRE_DEF cannot have an input type of
         LIST_AND_BOOL, LIST_AND_INT, etc"""
-
 
         # Ensure input type and mode combinations are correct
         if self.input_type == InputType.LIST_AND_BOOL and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
@@ -198,7 +198,7 @@ class Model:
                 level=logging.DEBUG)
 
             logging.debug(f"[MODEL]: {self.name} model running (Required input type: {self.input_type}, "
-              f"Output type: {self.output_type})")
+                          f"Output type: {self.output_type})")
 
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
         self.check_constraint_initial_input_enabled(inputs)
@@ -217,7 +217,8 @@ class Model:
             self.save_output(data)
         else:
             if self.constraint.debug:
-                logging.debug(f"[MODEL]: {self.name} model complete with output -> {data} ({self.constraint.name})")
+                logging.debug(
+                    f"[MODEL]: {self.name} model COMPLETE with output -> {data} ({self.constraint.name})")
                 print()
 
             # ensure the output data is the same as the required output type
