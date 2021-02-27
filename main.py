@@ -1,11 +1,11 @@
-from constraint.custom_constraint import CustomConstraint
-from models.example_models.boolean_model_and import BooleanModelAND
-from models.example_models.constraint_input_model import ConstraintInputAsOutputModel
-from models.example_models.keyword_model import KeywordModel
-from models.example_models.test_combined_constraint import TestCombinedConstraintModel
-from models.example_models.test_model import TestModel
-from models.example_models.time_model import TimeModel
-from models.example_models.verification_model import VerificationModel
+from constraints.constraint.custom_constraint import CustomConstraint
+from constraints.models.example_models.boolean_model_and import BooleanModelAND
+from constraints.models.example_models.constraint_input_model import ConstraintInputAsOutputModel
+from constraints.models.example_models.keyword_model import KeywordModel
+from constraints.models.example_models.test_combined_constraint import TestCombinedConstraintModel
+from constraints.models.example_models.test_model import TestModel
+from constraints.models.example_models.time_model import TimeModel
+from constraints.models.example_models.verification_model import VerificationModel
 from stage.stage import Stage, StageGroup
 
 # keyword_model = KeywordModel()

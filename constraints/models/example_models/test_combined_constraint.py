@@ -1,9 +1,9 @@
 import time
 
-from enums.input_type import InputType
-from enums.model_family import ModelFamily
-from models.model_parent import Model
-from enums.constraint_input_mode import ConstraintInputMode
+from constraints.models.model_parent import Model
+from constraints.enums.model_family import ModelFamily
+from constraints.enums.input_type import InputType
+from constraints.enums.constraint_input_mode import ConstraintInputMode
 
 
 class TestCombinedConstraintModel(Model):

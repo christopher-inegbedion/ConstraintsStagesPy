@@ -1,7 +1,7 @@
-from enums.constraint_input_mode import ConstraintInputMode
-from enums.input_type import InputType
-from enums.model_family import ModelFamily
-from models.model_parent import Model
+from constraints.models.model_parent import Model
+from constraints.enums.model_family import ModelFamily
+from constraints.enums.input_type import InputType
+from constraints.enums.constraint_input_mode import ConstraintInputMode
 
 
 class ConstraintInputAsOutputModel(Model):
@@ -16,7 +16,8 @@ class ConstraintInputAsOutputModel(Model):
         self.input_count = 2
         self.output_type = InputType.ANY
 
-        super().__init__(self.name, self.model_family, self.input_type, self.input_mode, self.input_count, self.output_type)
+        super().__init__(self.name, self.model_family, self.input_type,
+                         self.input_mode, self.input_count, self.output_type)
 
     def run(self, inputs: list):
         super().run(inputs)
@@ -39,4 +40,3 @@ class ConstraintInputAsOutputModel(Model):
 
     def _complete(self, data, aborted=False):
         super()._complete(data)
-

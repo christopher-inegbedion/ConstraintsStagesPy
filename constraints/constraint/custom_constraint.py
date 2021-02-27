@@ -1,6 +1,6 @@
-from constraint.constraint import Constraint
-from enums.constraint_status import ConstraintStatus
-from constraint.flag import Flag
+from constraints.constraint.constraint import Constraint
+from constraints.enums.constraint_status import ConstraintStatus
+from constraints.constraint.flag import Flag
 
 
 class CustomConstraint(Constraint):

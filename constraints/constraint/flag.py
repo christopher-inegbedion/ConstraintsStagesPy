@@ -1,9 +1,10 @@
 import time
-from enums.constraint_status import ConstraintStatus
+from constraints.enums.constraint_status import ConstraintStatus
 
 
 class Flag:
     """The flag describes a constraints properties"""
+
     def __init__(self, name: str, status: ConstraintStatus, initial_input_required: bool, required: bool, combined: bool,
                  prev_constraint_id: str,
                  next_constraint_id: str):
