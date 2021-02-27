@@ -1,7 +1,7 @@
 from constraints.enums.constraint_status import ConstraintStatus
 from constraints.enums.model_family import ModelFamily
 from constraints.exception_messages import *
-from constraints.constraint.flag import Flag
+from constraints.constraint_main.flag import Flag
 from constraints.models.model_parent import Model
 from abc import ABC, abstractmethod
 from constraints.enums.input_type import InputType

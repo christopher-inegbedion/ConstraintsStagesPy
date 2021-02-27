@@ -1,4 +1,4 @@
-from constraints.constraint.custom_constraint import CustomConstraint
+from constraints.constraint_main.custom_constraint import CustomConstraint
 from constraints.models.example_models.boolean_model_and import BooleanModelAND
 from constraints.models.example_models.constraint_input_model import ConstraintInputAsOutputModel
 from constraints.models.example_models.keyword_model import KeywordModel
