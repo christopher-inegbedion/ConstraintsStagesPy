@@ -93,6 +93,14 @@ class Constraint(ABC):
         # begin the model
         self.model.run(self.inputs)
 
+    def pause(self):
+        """Pause the constraint"""
+        if self.get_status() == ConstraintStatus.ACTIVE:
+            self.model.pause()
+
+    def get_status(self) -> ConstraintStatus:
+        return self.flag.status
+
     def validate_and_add_user_input(self, data):
         """This method validates the data provided by the constraint user. Used for USER input mode."""
         if self.model.input_type == InputType.BOOL:  # boolean input

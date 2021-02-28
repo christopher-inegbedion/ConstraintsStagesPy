@@ -21,7 +21,6 @@ class TestModel(Model):
 
     def run(self, inputs: list):
         super().run(inputs)
-        # self.abort()
 
         # input1 = self.request_input()
         self._complete(inputs[0])
