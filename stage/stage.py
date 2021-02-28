@@ -1,15 +1,37 @@
+from constraints.constraint_main.constraint import Constraint
+
+
 class Stage:
+    """A stage is a collection of constraints"""
+
     def __init__(self, name: str):
         self.name = name
         self.constraints = []
 
     def start(self):
+        """Begin a stage and its constraints"""
         print(f">>{self.name}<<")
-        for constraint in self.constraints:
-            constraint.start()
 
-    def add_constraint(self, constraint):
-        self.constraints.append(constraint)
+        if len(self.constraints) > 0:
+            for constraint in self.constraints:
+                constraint.start()
+        else:
+            raise Exception(
+                "Constraints have not been passed to this stage")
+
+    def add_constraint(self, constraint: Constraint):
+        """Add a constraint to the stage"""
+        if constraint != None or type(constraint) != Constraint:
+            self.constraints.append(constraint)
+        else:
+            raise Exception("An invalid constraint was passed")
+
+    def remove_constraint(self, constraint: Constraint):
+        """Remove a constraint from a stage"""
+        if len(self.constraints) > 0:
+            self.constraints.remove(constraint)
+        else:
+            raise Exception("Constraints have not been added to the stage")
 
 
 class StageGroup:
