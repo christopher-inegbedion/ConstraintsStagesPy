@@ -8,17 +8,22 @@ class Stage:
     def __init__(self, name: str):
         self.name = name
         self.constraints: List[Constraint] = []
+        self.stage_group: StageGroup = None
 
     def start(self):
         """Begin a stage and its constraints"""
         print(f">>{self.name}<<")
 
         if len(self.constraints) > 0:
+            self.stage_group.set_current_stage(self)
             for constraint in self.constraints:
                 constraint.start()
         else:
             raise Exception(
                 "Constraints have not been passed to this stage")
+
+    def set_stage_group(self, stage_group):
+        self.stage_group = stage_group
 
     def add_constraint(self, constraint: Constraint):
         """Add a constraint to the stage"""
@@ -46,6 +51,10 @@ class StageGroup:
     def __init__(self):
         self.stages: List[Stage] = []
         self.status = None
+        self.current_stage = None
+
+    def set_current_stage(self, current_stage):
+        self.current_stage = current_stage
 
     def _get_stage_with_name(self, stage_name: str) -> Stage:
         for stage in self.stages:
