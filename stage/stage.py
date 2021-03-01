@@ -51,7 +51,7 @@ class StageGroup:
     def __init__(self):
         self.stages: List[Stage] = []
         self.status = None
-        self.current_stage = None
+        self.current_stage = "None"
 
     def set_current_stage(self, current_stage):
         self.current_stage = current_stage
