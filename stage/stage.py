@@ -16,8 +16,8 @@ class Stage:
 
         if len(self.constraints) > 0:
             self.stage_group.set_current_stage(self)
-            for constraint in self.constraints:
-                constraint.start()
+            # for constraint in self.constraints:
+            #     constraint.start()
         else:
             raise Exception(
                 "Constraints have not been passed to this stage")
@@ -83,8 +83,8 @@ class StageGroup:
         """Start a stage given its name"""
         if stage_name == "":
             if len(self.stages) > 0:
-                for stage in self.stages:
-                    stage.start()
+                # TODO: Make the start function for the Stages async so they launch when the previous stage is complete.
+                self.stages[0].start()
             else:
                 raise Exception("There are no stages in the stage group")
         else:
