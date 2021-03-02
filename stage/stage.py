@@ -22,6 +22,13 @@ class Stage:
             raise Exception(
                 "Constraints have not been passed to this stage")
 
+    def get_constraint(self, name):
+        for cnstrt in self.constraints:
+            if cnstrt.name == name:
+                return cnstrt
+
+        raise Exception("Constraint cannot be found")
+
     def set_stage_group(self, stage_group):
         self.stage_group = stage_group
 
@@ -61,7 +68,7 @@ class StageGroup:
             if stage.name == stage_name:
                 return stage
 
-        return None
+        raise Exception("Stage cannot be found")
 
     def add_stage(self, stage: Stage):
         """Add a stage"""
@@ -69,10 +76,7 @@ class StageGroup:
 
     def remove_stage(self, stage_name: str):
         """Remove a stage provided its name"""
-        if len(self.stages) > 0:
-            self.stages.remove(self._get_stage_with_name(stage_name))
-        else:
-            raise Exception("There are no stages in the stage group")
+        self.stages.remove(self._get_stage_with_name(stage_name))
 
     def start(self, stage_name=""):
         """Start a stage given its name"""

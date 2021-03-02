@@ -51,6 +51,7 @@ combined_constraint.add_input(constraint2)
 
 stage = Stage("stage 1")
 stage.add_constraint(combined_constraint)
+stage.get_constraint("combined constraint")
 
 stage2 = Stage("stage 2")
 stage2.add_constraint(combined_constraint)
