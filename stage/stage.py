@@ -73,6 +73,7 @@ class StageGroup:
     def add_stage(self, stage: Stage):
         """Add a stage"""
         self.stages.append(stage)
+        stage.set_stage_group(self)
 
     def remove_stage(self, stage_name: str):
         """Remove a stage provided its name"""
