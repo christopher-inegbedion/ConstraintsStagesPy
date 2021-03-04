@@ -67,7 +67,6 @@ class Stage:
         if self.status == StageStatus.ACTIVE:
             self.running_constraints.append(constraint)
 
-            self.upgrade_status()
             new_constraint = threading.Thread(
                 target=constraint.start, args=())
             new_constraint.setName(constraint.name)
@@ -116,8 +115,9 @@ class StageGroup:
         self.stage_threads = []
         self.stage_thread_instance_lock = threading.Lock()
 
-    def set_current_stage(self, current_stage):
+    def set_current_stage(self, current_stage: Stage):
         self.current_stage = current_stage
+        current_stage.upgrade_status()
 
     def _get_stage_with_name(self, stage_name: str) -> Stage:
         for stage in self.stages:
