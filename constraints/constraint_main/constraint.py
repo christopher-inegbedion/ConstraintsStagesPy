@@ -249,3 +249,7 @@ class Constraint(ABC):
                 raise Exception(MANUAL_INPUT_NOT_ALLOWED)
         else:
             raise Exception(INITIAL_INPUT_NOT_ENABLED)
+
+    def show_constraint_stage_not_active_err_msg(self):
+        print(
+            f"[Constraint {self.name} cannot start. Its stage has not begun]")

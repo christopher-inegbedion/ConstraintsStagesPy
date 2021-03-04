@@ -62,14 +62,19 @@ class Stage:
     def start_constraint(self, name, debug=False):
         """Start a new thread for a constraint"""
         constraint = self.get_constraint(name)
-        self.running_constraints.append(constraint)
 
-        self.upgrade_status()
-        new_constraint = threading.Thread(
-            target=constraint.start, args=())
-        new_constraint.setName(constraint.name)
+        # Start a constraint only if the stage is running
+        if self.status == StageStatus.ACTIVE:
+            self.running_constraints.append(constraint)
 
-        new_constraint.start()
+            self.upgrade_status()
+            new_constraint = threading.Thread(
+                target=constraint.start, args=())
+            new_constraint.setName(constraint.name)
+
+            new_constraint.start()
+        else:
+            constraint.show_constraint_stage_not_active_err_msg()
 
     def upgrade_status(self):
         if self.has_constraint_started is False:
