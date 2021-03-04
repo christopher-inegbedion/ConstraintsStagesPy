@@ -5,6 +5,7 @@ from typing import List
 import threading
 from constraints.constraint_main.constraint import Constraint
 import concurrent.futures
+import time
 
 
 class Stage:
@@ -62,6 +63,9 @@ class Stage:
     def start_constraint(self, name, debug=False):
         """Start a new thread for a constraint"""
         constraint = self.get_constraint(name)
+
+        # this pause in the main thread is need to give time for the stage to begin
+        time.sleep(0.25)
 
         # Start a constraint only if the stage is running
         if self.status == StageStatus.ACTIVE:
@@ -137,6 +141,7 @@ class StageGroup:
 
     def start(self, stage_name=""):
         """Start a stage given its name"""
+
         if stage_name == "":
             if len(self.stages) > 0:
                 # TODO: Make the start function for the Stages async so they launch when the previous stage is complete.
