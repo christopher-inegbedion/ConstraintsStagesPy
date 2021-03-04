@@ -21,7 +21,7 @@ class Constraint(ABC):
 
         Order of operation :- [INPUT]start() -> [MODEL]model.run([INPUT]) -> [OUTPUT]complete(data)"""
         self.name = name  # constraint name for debugging purposes
-        self.flag = flag  # constraint's flag
+        self.flag: Flag = flag  # constraint's flag
         self.inputs = []  # constraint's input(s)
         self.model = model  # constraint's model
         self.output = None  # constraint's output
@@ -47,9 +47,11 @@ class Constraint(ABC):
             constraint.flag.set_required(True)
 
     @abstractmethod
-    def start(self):
+    def start(self, d: bool = False):
         """This method starts the constraint. This is where the inputs are retrieved and passed to the model"""
-        self.flag.start_constraint()  # initialize the constraint's flag details.
+        self.debug = d
+        # initialize the constraint's flag details.
+        self.flag.start_constraint()
 
         if self.debug:
             logging.basicConfig(level=logging.DEBUG)

@@ -12,5 +12,5 @@ class CustomConstraint(Constraint):
     def __init__(self, name, model, flag=None, debug=False):
         super().__init__(name, flag, model, debug)
 
-    def start(self):
-        super().start()
+    def start(self, d=False):
+        super().start(d=self.debug)
