@@ -102,10 +102,9 @@ class Stage:
         else:
             raise Exception("Constraints have not been added to the stage")
 
-    def freeze(self):
-        """Pause the stage, and any running constraints"""
-        for constraint in self.constraints:
-            constraint.pause()
+    def stop_constraint(self, constraint_name):
+        """Stop a constraint"""
+        self.get_constraint(constraint_name).model.abort()
 
 
 class StageGroup:

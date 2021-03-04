@@ -214,7 +214,6 @@ class Model:
         This method is called from run(...) method"""
         if aborted or self.aborted:
             self.aborted = aborted
-            self.save_output(data)
         else:
             if self.constraint.debug:
                 logging.debug(
@@ -229,9 +228,9 @@ class Model:
             elif self.output_type == InputType.BOOL and type(data) != bool:
                 raise Exception(INVALID_OUTPUT_TYPE_BOOL_REQUIRED)
 
-            # save model's output
-            self.save_output(data)
-            self.constraint.flag.complete_constraint()
+        # save model's output
+        self.save_output(data)
+        self.constraint.flag.complete_constraint()
 
     def save_output(self, data):
         self.output = data

@@ -1,3 +1,4 @@
+from constraints.models.example_models.pause_thread import PauseModel
 from constraints.constraint_main.custom_constraint import CustomConstraint
 from constraints.models.example_models.boolean_model_and import BooleanModelAND
 from constraints.models.example_models.constraint_input_model import ConstraintInputAsOutputModel
@@ -25,7 +26,13 @@ combined_constraint = CustomConstraint(
 combined_constraint.add_input(constraint1)
 combined_constraint.add_input(constraint2)
 
+time_constraint = CustomConstraint(
+    "time", PauseModel(), debug=False
+)
+time_constraint.add_input(20)
+
 stage = Stage("stage 1")
+stage.add_constraint(time_constraint)
 stage.add_constraint(combined_constraint)
 
 stage2 = Stage("stage 2")
@@ -37,8 +44,9 @@ stage2.add_constraint(constraint3)
 stage_group = StageGroup()
 stage_group.add_stage(stage)
 stage_group.add_stage(stage2)
-stage_group.start("stage 1")
+stage_group.start()
 
+stage.start_constraint("time")
+# time.sleep(5)
+stage.stop_constraint("time")
 stage.start_constraint("combined constraint")
-time.sleep(5)
-stage2.start_constraint("combined constraint")
