@@ -46,7 +46,7 @@ stage_group.add_stage(stage)
 stage_group.add_stage(stage2)
 stage_group.start()
 
-stage.start_constraint("time")
+# stage.start_constraint("time")
 # time.sleep(5)
 stage.stop_constraint("time")
 stage.start_constraint("combined constraint")

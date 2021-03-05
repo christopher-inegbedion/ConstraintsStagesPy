@@ -136,6 +136,8 @@ class Model:
                 print(f"(x) MODEL: {self.name} aborted (x)")
             else:
                 print(msg)
+        else:
+            print(f"[Constraint: {self.constraint.name} is not active.]")
 
         self._complete(None, True)
 
