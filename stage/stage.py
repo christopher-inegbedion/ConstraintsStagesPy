@@ -52,6 +52,10 @@ class Stage:
         self.running_constraints.clear()
         self.status = StageStatus.COMPLETE
 
+    def set_task_for_constraint(self, constraint_name, task):
+        constraint = self.get_constraint(constraint_name)
+        constraint.set_task_instance(task)
+
     def get_constraint(self, name):
         """Find a constraint in the stage"""
         for cnstrt in self.constraints:
@@ -171,6 +175,11 @@ class StageGroup:
                     raise Exception(f"The stage:'{stage_name}' does not exist")
             else:
                 raise Exception("There are no stages in the stage group")
+
+    def set_task_for_stage(self, stage_name, task):
+        stage = self._get_stage_with_name(stage_name)
+        for constraint in stage.constraints:
+            stage.set_task_for_constraint(constraint.name, task)
 
     def stop_stage(self, stage_name):
         stage = self._get_stage_with_name(stage_name)
