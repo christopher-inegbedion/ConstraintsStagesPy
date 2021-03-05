@@ -48,7 +48,7 @@ class Stage:
 
     def _complete(self):
         """Complete the stage"""
-        print(f">>{self.name} COMPLETE")
+        print(f">{self.name} COMPLETE")
         self.running_constraints.clear()
         self.status = StageStatus.COMPLETE
 
@@ -78,6 +78,20 @@ class Stage:
             new_constraint.start()
         else:
             constraint.show_constraint_stage_not_active_err_msg()
+
+    def stop(self):
+        """Stop a constraint"""
+        is_there_no_active_constraint = True
+
+        for constraint in self.constraints:
+            if constraint.get_status() == ConstraintStatus.ACTIVE:
+                is_there_no_active_constraint = False
+                self.stop_constraint(constraint.name)
+
+        print(f">Stage: {self.name} is stopped.")
+
+        if is_there_no_active_constraint:
+            self._complete()
 
     def upgrade_status(self):
         if self.has_constraint_started is False:
@@ -157,3 +171,11 @@ class StageGroup:
                     raise Exception(f"The stage:'{stage_name}' does not exist")
             else:
                 raise Exception("There are no stages in the stage group")
+
+    def stop_stage(self, stage_name):
+        stage = self._get_stage_with_name(stage_name)
+        stage.stop()
+
+    def stop_all(self):
+        for stage in self.stages:
+            stage.stop()
