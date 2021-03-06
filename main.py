@@ -5,11 +5,16 @@ from constraints.models.example_models.constraint_input_model import ConstraintI
 from constraints.models.example_models.keyword_model import KeywordModel
 from constraints.models.example_models.test_combined_constraint import TestCombinedConstraintModel
 from constraints.models.example_models.test_model import TestModel
-from constraints.models.example_models.time_model import TimeModel
+from constraints.models.example_models.task_model import TaskModel
 from constraints.models.example_models.verification_model import VerificationModel
 from stage.stage import Stage, StageGroup
 import time
 import asyncio
+
+
+class Task:
+    def __init__(self, name):
+        self.name = name
 
 
 constraint1 = CustomConstraint("test1", TestModel(), debug=True)
@@ -44,12 +49,16 @@ stage2.add_constraint(constraint3)
 stage_group = StageGroup()
 stage_group.add_stage(stage)
 stage_group.add_stage(stage2)
-stage_group.start()
+# stage_group.start()
 
-time.sleep(4)
-stage_group.stop_all()
+# time.sleep(4)
+# stage_group.stop_all()
 
 # stage.start_constraint("time")
 # time.sleep(5)
 # stage.stop_constraint("time")
 # stage.start_constraint("combined constraint")
+
+task_constraint = CustomConstraint("Task constraint", TaskModel())
+task_constraint.add_input(Task('task'))
+task_constraint.start()

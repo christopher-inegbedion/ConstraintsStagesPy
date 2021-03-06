@@ -192,11 +192,15 @@ class Constraint(ABC):
                 self.inputs.append(data)
 
         elif self.model.input_type == InputType.CONSTRAINT:  # constraint input
-            if data is None:
+            if data == None:
                 raise Exception(INVALID_CONSTRAINT_INPUT_CONSTRAINT)
 
             self.inputs.append(data)
+        elif self.model.input_type == InputType.TASK:  # task input
+            if data == None:
+                raise Exception(INVALID_CONSTRAINT_INPUT_TASK)
 
+            self.inputs.append(data)
         elif self.model.input_type == InputType.ANY:  # any input (list)
             self.inputs.append(data)
 

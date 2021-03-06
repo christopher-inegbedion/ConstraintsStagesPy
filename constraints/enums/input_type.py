@@ -11,4 +11,5 @@ class InputType(Enum):
     LIST_AND_INT = "list and int"
     LIST_AND_STRING = "list and str"
     LIST_AND_CONSTRAINT = "list and constraint"
+    TASK = "task"
     ANY = "any"
