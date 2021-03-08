@@ -174,19 +174,19 @@ class Constraint(ABC):
         """This method validates the pre-defined data provided through function calls to the constraint.
          Used for PRE_DEF input mode."""
         if self.model.input_type == InputType.BOOL:  # bool input
-            if type(data) != bool:
+            if type(bool(data)) != bool:
                 raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
             else:
                 self.inputs.append(bool(data))
 
         elif self.model.input_type == InputType.STRING:  # string input
-            if type(data) != str:
+            if type(str(data)) != str:
                 raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
             else:
                 self.inputs.append(str(data))
 
         elif self.model.input_type == InputType.INT:  # int input
-            if type(data) != int:
+            if type(int(data)) != int:
                 raise Exception(INVALID_CONSTRAINT_INPUT_INT)
             else:
                 self.inputs.append(int(data))
