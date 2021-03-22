@@ -1,3 +1,4 @@
+from stage.stage_log import StageLog
 from constraints.constraint_main.constraint_log import ConstraintLog
 import constraints
 from constraints.enums.constraint_status import ConstraintStatus
@@ -7,7 +8,7 @@ import threading
 from constraints.constraint_main.constraint import Constraint
 import concurrent.futures
 import time
-from utils.update import Observer
+from utils.update import Observable, Observer
 from constraints.constraint_main.flag import Flag
 
 
@@ -20,6 +21,8 @@ class Stage(Observer):
         self.stage_group: StageGroup = None
         self.status: StageStatus = StageStatus.NOT_STARTED
         self.has_constraint_started = False
+        self.log = StageLog()
+        self.pipeline = None
 
         # The current constraint running
         self.running_constraints: List[Constraint] = []
@@ -41,6 +44,8 @@ class Stage(Observer):
 
         with self.stage_group.stage_thread_instance_lock:
             print(f">>{self.name} stage STARTED")
+            self.log.update_log(
+                "STARTED", True, f"Stage {self.name} has STARTED")
 
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
@@ -62,6 +67,9 @@ class Stage(Observer):
         """Complete the stage"""
         print(f">>{self.name} stage COMPLETE")
         self.running_constraints.clear()
+        self.log.update_log(
+            "COMPLETED", True, f"Stage {self.name} has COMPLETED")
+
         self.status = StageStatus.COMPLETE
 
     def set_task_for_constraint(self, constraint_name, task):
@@ -207,3 +215,7 @@ class StageGroup:
     def stop_all(self):
         for stage in self.stages:
             stage.stop()
+
+    def set_pipeline(self, pipeline):
+        self.pipeline = pipeline
+        self.log.attach(pipeline)
