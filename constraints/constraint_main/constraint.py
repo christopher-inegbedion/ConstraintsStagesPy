@@ -36,6 +36,7 @@ class Constraint(ABC):
         else:
             self.flag = Flag("ConstraintVerification",
                              ConstraintStatus.NOT_STARTED, False, False, False, "", "")
+        self.flag.set_constraint(self)
 
         # initialize the flag params for the constraints in the combined constraint's constraints
         if self.model.model_family == ModelFamily.COMBINED_CONSTRAINT:

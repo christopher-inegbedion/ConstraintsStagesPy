@@ -41,8 +41,14 @@ class Flag:
         # tracks the constraint's events
         self._init_log()
 
+        # flag's constraint owner object
+        self.constraint = None
+
     def _init_log(self):
         self.log: ConstraintLog = ConstraintLog()
+
+    def set_constraint(self, constraint):
+        self.constraint = constraint
 
     def log_error(self, err_msg):
         self.log.update_log("ERROR",
@@ -52,18 +58,18 @@ class Flag:
         """Called when a constraint is begun"""
         self.status = ConstraintStatus.ACTIVE
         self.log.update_log("INPUT_PASSED", input,
-                            f"Constraint {self.name} started with value {input}")
+                            f"Constraint {self.constraint.name} started with value {input}")
         self.log.update_log("CONSTRAINT_STARTED", True,
-                            f"Constraint {self.name} has started")
+                            f"Constraint {self.constraint.name} has started")
         self._set_start_time()
 
     def complete_constraint(self, output):
         """Called when a constraint is completed"""
         self.status = ConstraintStatus.COMPLETE
         self.log.update_log("CONSTRAINT_COMPLETED", True,
-                            f"Constraint {self.name} has completed")
+                            f"Constraint {self.constraint.name} has completed")
         self.log.update_log("OUTPUT_GENERATED", output,
-                            f"Constraint {self.name} completed with value {output}")
+                            f"Constraint {self.constraint.name} completed with value {output}")
         self._set_end_time()
 
     def _set_start_time(self):
