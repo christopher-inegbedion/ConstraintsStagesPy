@@ -1,3 +1,6 @@
+## v0.3.1-a (2020-03-22)
+- Added feature to log Stage events
+
 ## v0.3-a (2020-03-22)
 - Added feature to log Constraint events
 - Stop specific/multiple Stages in StageGroup
