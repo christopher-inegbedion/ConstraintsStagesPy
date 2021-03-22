@@ -1,4 +1,6 @@
 import time
+
+from constraints.constraint_main.constraint_log import ConstraintLog
 from constraints.enums.constraint_status import ConstraintStatus
 
 
@@ -36,14 +38,32 @@ class Flag:
         # the ID of the next constraint
         self.next_constraint_id = next_constraint_id
 
-    def start_constraint(self):
+        # tracks the constraint's events
+        self._init_log()
+
+    def _init_log(self):
+        self.log: ConstraintLog = ConstraintLog()
+
+    def log_error(self, err_msg):
+        self.log.update_log("ERROR",
+                            True, err_msg)
+
+    def start_constraint(self, input):
         """Called when a constraint is begun"""
         self.status = ConstraintStatus.ACTIVE
+        self.log.update_log("INPUT_PASSED", input,
+                            f"Constraint {self.name} started with value {input}")
+        self.log.update_log("CONSTRAINT_STARTED", True,
+                            f"Constraint {self.name} has started")
         self._set_start_time()
 
-    def complete_constraint(self):
+    def complete_constraint(self, output):
         """Called when a constraint is completed"""
         self.status = ConstraintStatus.COMPLETE
+        self.log.update_log("CONSTRAINT_COMPLETED", True,
+                            f"Constraint {self.name} has completed")
+        self.log.update_log("OUTPUT_GENERATED", output,
+                            f"Constraint {self.name} completed with value {output}")
         self._set_end_time()
 
     def _set_start_time(self):

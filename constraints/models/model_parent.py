@@ -65,11 +65,11 @@ class Model:
             elif data.lower() == "false":
                 return False
             else:
-                raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_BOOL)
 
         elif self.input_type == InputType.STRING:  # string input
             if data.isspace():
-                raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_STRING)
 
             return data
 
@@ -78,34 +78,35 @@ class Model:
                 if data.isnumeric():
                     return int(data)
                 else:
-                    raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+                    raise self._raise_exception(INVALID_CONSTRAINT_INPUT_INT)
             else:
-                raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_INT)
 
     def validate_and_add_pre_def_input(self, data):
         """This method validates the pre-defined data provided through function calls to the constraint.
                  Used for PRE_DEF input mode."""
         if self.input_type == InputType.BOOL:  # bool input
             if type(data) != bool:
-                raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_BOOL)
             else:
                 return data
 
         elif self.input_type == InputType.STRING:  # string input
             if type(data) != str:
-                raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_STRING)
             else:
                 return data
 
         elif self.input_type == InputType.INT:  # int input
             if type(data) != int:
-                raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_INT)
             else:
                 return data
 
         elif self.input_type == InputType.CONSTRAINT:  # constraint input
             if data is None:
-                raise Exception(INVALID_CONSTRAINT_INPUT_CONSTRAINT)
+                raise self._raise_exception(
+                    INVALID_CONSTRAINT_INPUT_CONSTRAINT)
 
             return data
 
@@ -124,7 +125,8 @@ class Model:
     def pause(self, seconds):
         """Pause the threads by the seconds arg."""
         if type(seconds) != int:
-            raise Exception("Invalid argument type passed (int type required)")
+            raise self._raise_exception(
+                "Invalid argument type passed (int type required)")
 
         if self.constraint.flag.status == ConstraintStatus.ACTIVE:
             time.sleep(seconds)
@@ -163,7 +165,7 @@ class Model:
         if self.model_family == ModelFamily.COMBINED_CONSTRAINT:
             for constraint in data:
                 if constraint.model.initial_input_required is not True:
-                    raise Exception(
+                    raise self._raise_exception(
                         INITIAL_INPUT_REQUIRED_FOR_COMBINED_CONSTRAINT)
 
     def _perform_input_safety_check(self):
@@ -177,13 +179,13 @@ class Model:
 
         # Ensure input type and mode combinations are correct
         if self.input_type == InputType.LIST_AND_BOOL and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
-            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
+            raise self._raise_exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
         if self.input_type == InputType.LIST_AND_CONSTRAINT and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
-            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
+            raise self._raise_exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
         if self.input_type == InputType.LIST_AND_INT and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
-            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
+            raise self._raise_exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
         if self.input_type == InputType.LIST_AND_STRING and self.input_mode != ConstraintInputMode.MIXED_USER_PRE_DEF:
-            raise Exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
+            raise self._raise_exception(INCOMPATIBLE_INPUT_TYPE_AND_MODE)
 
     def set_constraint(self, constraint):
         """Set the constraint object using the model"""
@@ -195,6 +197,9 @@ class Model:
     @abstractmethod
     def run(self, inputs: list):
         """Method that works on the input(s) provided and produces output"""
+        if self.constraint is None:
+            raise self._raise_exception(CONSTRAINT_NOT_SET)
+
         if self.constraint.debug:
             logging.basicConfig(
                 level=logging.DEBUG)
@@ -204,9 +209,6 @@ class Model:
 
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
         self.check_constraint_initial_input_enabled(inputs)
-
-        if self.constraint is None:
-            raise Exception(CONSTRAINT_NOT_SET)
 
     @abstractmethod
     def _complete(self, data, aborted=False):
@@ -224,16 +226,21 @@ class Model:
 
             # ensure the output data is the same as the required output type
             if self.output_type == InputType.INT and type(data) != int:
-                raise Exception(INVALID_OUTPUT_TYPE_INT_REQUIRED)
+                raise self._raise_exception(INVALID_OUTPUT_TYPE_INT_REQUIRED)
             elif self.output_type == InputType.STRING and type(data) != str:
-                raise Exception(INVALID_OUTPUT_TYPE_STRING_REQUIRED)
+                raise self._raise_exception(
+                    INVALID_OUTPUT_TYPE_STRING_REQUIRED)
             elif self.output_type == InputType.BOOL and type(data) != bool:
-                raise Exception(INVALID_OUTPUT_TYPE_BOOL_REQUIRED)
+                raise self._raise_exception(INVALID_OUTPUT_TYPE_BOOL_REQUIRED)
 
         # save model's output
         self.save_output(data)
-        self.constraint.flag.complete_constraint()
+        self.constraint.flag.complete_constraint(data)
 
     def save_output(self, data):
         self.output = data
         self.constraint.output = data
+
+    def _raise_exception(self, exception_msg) -> Exception:
+        self.flag.log_error(exception_msg)
+        return Exception(exception_msg)

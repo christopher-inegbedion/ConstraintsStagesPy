@@ -1,3 +1,4 @@
+from constraints.constraint_main.constraint_log import ConstraintLog
 from constraints.enums.constraint_status import ConstraintStatus
 from constraints.enums.model_family import ModelFamily
 from constraints.exception_messages import *
@@ -26,7 +27,6 @@ class Constraint(ABC):
         self.model = model  # constraint's model
         self.output = None  # constraint's output
         self.debug = debug  # determines if debug messages will be displayed
-        self.task_instance = None  # constraint's task
 
         # support for providing custom flags
         if flag is not None:
@@ -52,8 +52,8 @@ class Constraint(ABC):
         """This method starts the constraint. This is where the inputs are retrieved and passed to the model"""
         self.debug = d
         # initialize the constraint's flag details.
-        self.flag.start_constraint()
 
+        # display debug info.
         if self.debug:
             logging.basicConfig(level=logging.DEBUG)
             logging.debug(f"[CONSTRAINT]: {self.name} running")
@@ -79,7 +79,8 @@ class Constraint(ABC):
                     self.model.input_count = input_count
                 else:
                     if len(self.inputs) > self.model.input_count or len(self.inputs) < self.model.input_count:
-                        raise Exception(INSUFFICIENT_AMOUNT_OF_INPUTS_ENTERED)
+                        raise self._raise_exception(
+                            INSUFFICIENT_AMOUNT_OF_INPUTS_ENTERED)
 
             # Input can be entered through the console and function calls. For this
             # input mode, the first input has to be a pre-defined value and the remaining
@@ -93,6 +94,8 @@ class Constraint(ABC):
 
                         self.validate_and_add_user_input(user_input)
 
+            self.flag.start_constraint(self.inputs)
+
         # begin the model
         self.model.run(self.inputs)
 
@@ -100,14 +103,6 @@ class Constraint(ABC):
         """Pause the constraint"""
         if self.get_status() == ConstraintStatus.ACTIVE:
             self.model.pause()
-
-    def get_task_instance(self):
-        """Return the constraint's task instance"""
-        return self.task_instance
-
-    def set_task_instance(self, task):
-        """Sets the constraint's Task"""
-        self.task_instance = task
 
     def get_status(self) -> ConstraintStatus:
         return self.flag.status
@@ -120,11 +115,11 @@ class Constraint(ABC):
             elif data.lower() == "false":
                 self.inputs.append(False)
             else:
-                raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_BOOL)
 
         elif self.model.input_type == InputType.STRING:  # string input
             if data.isspace():
-                raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_STRING)
 
             self.inputs.append(data)
 
@@ -133,9 +128,9 @@ class Constraint(ABC):
                 if data.isnumeric():
                     self.inputs.append(int(data))
                 else:
-                    raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+                    raise self._raise_exception(INVALID_CONSTRAINT_INPUT_INT)
             else:
-                raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_INT)
 
         elif self.model.input_type == InputType.LIST_AND_BOOL:  # a list and bool combination
             # This type of input can only be used if the input mode of the model is mixed.
@@ -143,7 +138,7 @@ class Constraint(ABC):
 
             # ensure that the first input has been entered before the console input is entered
             if self.inputs == []:
-                raise Exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
+                raise self._raise_exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
 
             self.inputs.append(data)
         elif self.model.input_type == InputType.LIST_AND_STRING:  # a list and bool combination
@@ -152,7 +147,7 @@ class Constraint(ABC):
 
             # ensure that the first input has been entered before the console input is entered
             if self.inputs == []:
-                raise Exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
+                raise self._raise_exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
 
             self.inputs.append(data)
         elif self.model.input_type == InputType.LIST_AND_INT:  # a list and bool combination
@@ -161,7 +156,7 @@ class Constraint(ABC):
 
             # ensure that the first input has been entered before the console input is entered
             if self.inputs == []:
-                raise Exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
+                raise self._raise_exception(CONSTRAINT_INPUT_ORDER_MISMATCH)
 
             self.inputs.append(data)
         elif self.model.input_type == InputType.LIST_AND_CONSTRAINT:  # a list and bool combination
@@ -174,33 +169,30 @@ class Constraint(ABC):
         """This method validates the pre-defined data provided through function calls to the constraint.
          Used for PRE_DEF input mode."""
         if self.model.input_type == InputType.BOOL:  # bool input
-            if type(bool(data)) != bool:
-                raise Exception(INVALID_CONSTRAINT_INPUT_BOOL)
+            if type(data) != bool:
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_BOOL)
             else:
-                self.inputs.append(bool(data))
+                self.inputs.append(data)
 
         elif self.model.input_type == InputType.STRING:  # string input
-            if type(str(data)) != str:
-                raise Exception(INVALID_CONSTRAINT_INPUT_STRING)
+            if type(data) != str:
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_STRING)
             else:
-                self.inputs.append(str(data))
+                self.inputs.append(data)
 
         elif self.model.input_type == InputType.INT:  # int input
-            if type(int(data)) != int:
-                raise Exception(INVALID_CONSTRAINT_INPUT_INT)
+            if type(data) != int:
+                raise self._raise_exception(INVALID_CONSTRAINT_INPUT_INT)
             else:
-                self.inputs.append(int(data))
+                self.inputs.append(data)
 
         elif self.model.input_type == InputType.CONSTRAINT:  # constraint input
-            if data == None:
-                raise Exception(INVALID_CONSTRAINT_INPUT_CONSTRAINT)
+            if data is None:
+                raise self._raise_exception(
+                    INVALID_CONSTRAINT_INPUT_CONSTRAINT)
 
             self.inputs.append(data)
-        elif self.model.input_type == InputType.TASK:  # task input
-            if data == None:
-                raise Exception(INVALID_CONSTRAINT_INPUT_TASK)
 
-            self.inputs.append(data)
         elif self.model.input_type == InputType.ANY:  # any input (list)
             self.inputs.append(data)
 
@@ -212,9 +204,10 @@ class Constraint(ABC):
 
             # ensure that only a single pre-defined input can be stored
             if len(self.inputs) == 1:
-                raise Exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
+                raise self._raise_exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
             elif type(data) != list:
-                raise Exception(MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
+                raise self._raise_exception(
+                    MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
 
             self.inputs.append(data)
         elif self.model.input_type == InputType.LIST_AND_STRING:  # a list and bool combination
@@ -223,9 +216,10 @@ class Constraint(ABC):
 
             # ensure that only a single pre-defined input can be stored
             if len(self.inputs) == 1:
-                raise Exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
+                raise self._raise_exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
             elif type(data) != list:
-                raise Exception(MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
+                raise self._raise_exception(
+                    MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
 
             self.inputs.append(data)
         elif self.model.input_type == InputType.LIST_AND_INT:  # a list and bool combination
@@ -234,9 +228,10 @@ class Constraint(ABC):
 
             # ensure that only a single pre-defined input can be stored
             if len(self.inputs) == 1:
-                raise Exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
+                raise self._raise_exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
             elif type(data) != list:
-                raise Exception(MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
+                raise self._raise_exception(
+                    MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
 
             self.inputs.append(data)
         elif self.model.input_type == InputType.LIST_AND_CONSTRAINT:  # a list and bool combination
@@ -245,9 +240,10 @@ class Constraint(ABC):
 
             # ensure that only a single pre-defined input can be stored
             if len(self.inputs) == 1:
-                raise Exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
+                raise self._raise_exception(PRE_DEF_INPUTS_ALREADY_EXISTING)
             elif type(data) != list:
-                raise Exception(MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
+                raise self._raise_exception(
+                    MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
 
             self.inputs.append(data)
 
@@ -259,10 +255,18 @@ class Constraint(ABC):
                     or self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
                 self.validate_and_add_predef_input(data)
             else:
-                raise Exception(MANUAL_INPUT_NOT_ALLOWED)
+                raise self._raise_exception(MANUAL_INPUT_NOT_ALLOWED)
         else:
-            raise Exception(INITIAL_INPUT_NOT_ENABLED)
+            raise self._raise_exception(INITIAL_INPUT_NOT_ENABLED)
 
     def show_constraint_stage_not_active_err_msg(self):
         print(
             f"[Constraint {self.name} cannot start. Its stage has not begun]")
+
+    def set_stage(self, stage):
+        self.stage = stage
+        self.flag.log.attach(stage)
+
+    def _raise_exception(self, exception_msg) -> Exception:
+        self.flag.log_error(exception_msg)
+        return Exception(exception_msg)

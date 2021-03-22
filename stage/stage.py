@@ -1,3 +1,4 @@
+from constraints.constraint_main.constraint_log import ConstraintLog
 import constraints
 from constraints.enums.constraint_status import ConstraintStatus
 from constraints.enums.stage_status import StageStatus
@@ -6,9 +7,11 @@ import threading
 from constraints.constraint_main.constraint import Constraint
 import concurrent.futures
 import time
+from utils.update import Observer
+from constraints.constraint_main.flag import Flag
 
 
-class Stage:
+class Stage(Observer):
     """A collection of constraints"""
 
     def __init__(self, name: str):
@@ -21,14 +24,23 @@ class Stage:
         # The current constraint running
         self.running_constraints: List[Constraint] = []
 
+    def on_update(self, observer: ConstraintLog) -> None:
+        """Notifies the Stage of a change in the Constraint"""
+        print(observer.most_recent_update)
+
+        return super().on_update(observer)
+
     def start(self):
         """Create a new thread for the stage"""
         threading.Thread(target=self._start, args=()).start()
 
     def _start(self):
         """Main function to begin a stage"""
+        if self.stage_group == None:
+            raise Exception("A stage group does not exist")
+
         with self.stage_group.stage_thread_instance_lock:
-            print(f">>{self.name}<<")
+            print(f">>{self.name} stage STARTED")
 
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
@@ -48,13 +60,9 @@ class Stage:
 
     def _complete(self):
         """Complete the stage"""
-        print(f">{self.name} COMPLETE")
+        print(f">>{self.name} stage COMPLETE")
         self.running_constraints.clear()
         self.status = StageStatus.COMPLETE
-
-    def set_task_for_constraint(self, constraint_name, task):
-        constraint = self.get_constraint(constraint_name)
-        constraint.set_task_instance(task)
 
     def get_constraint(self, name):
         """Find a constraint in the stage"""
@@ -110,6 +118,7 @@ class Stage:
         """Add a constraint to the stage"""
         if constraint != None:
             self.constraints.append(constraint)
+            constraint.set_stage(self)
         else:
             raise Exception("An invalid constraint was passed")
 
@@ -134,6 +143,8 @@ class StageGroup:
         self.current_stage = "None"
 
         self.stage_threads = []
+
+        # allows for a single stage to be active at any time
         self.stage_thread_instance_lock = threading.Lock()
 
     def set_current_stage(self, current_stage: Stage):
@@ -175,11 +186,6 @@ class StageGroup:
                     raise Exception(f"The stage:'{stage_name}' does not exist")
             else:
                 raise Exception("There are no stages in the stage group")
-
-    def set_task_for_stage(self, stage_name, task):
-        stage = self._get_stage_with_name(stage_name)
-        for constraint in stage.constraints:
-            stage.set_task_for_constraint(constraint.name, task)
 
     def stop_stage(self, stage_name):
         stage = self._get_stage_with_name(stage_name)
