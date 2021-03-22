@@ -275,7 +275,6 @@ class Constraint(ABC):
 
     def set_stage(self, stage):
         self.stage = stage
-        print(stage.name)
         self.flag.log.attach(stage)
 
         # Child constraint's have to be passed the stage object manually
