@@ -28,6 +28,7 @@ class Constraint(ABC):
         self.output = None  # constraint's output
         self.debug = debug  # determines if debug messages will be displayed
         self.task_instance = None  # constraint's task
+        self.stage = None
 
         # support for providing custom flags
         if flag is not None:
