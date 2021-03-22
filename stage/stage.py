@@ -45,7 +45,7 @@ class Stage(Observer):
         with self.stage_group.stage_thread_instance_lock:
             print(f">>{self.name} stage STARTED")
             self.log.update_log(
-                "STARTED", True, f"Stage {self.name} has STARTED")
+                "STAGE_STARTED", True, f"Stage {self.name} has STARTED")
 
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
@@ -68,7 +68,7 @@ class Stage(Observer):
         print(f">>{self.name} stage COMPLETE")
         self.running_constraints.clear()
         self.log.update_log(
-            "COMPLETED", True, f"Stage {self.name} has COMPLETED")
+            "STAGE_COMPLETED", True, f"Stage {self.name} has COMPLETED")
 
         self.status = StageStatus.COMPLETE
 

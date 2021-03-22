@@ -51,13 +51,13 @@ class Flag:
         self.constraint = constraint
 
     def log_error(self, err_msg):
-        self.log.update_log("ERROR",
+        self.log.update_log("CONSTRAINT_ERROR",
                             True, err_msg)
 
     def start_constraint(self, input):
         """Called when a constraint is begun"""
         self.status = ConstraintStatus.ACTIVE
-        self.log.update_log("INPUT_PASSED", input,
+        self.log.update_log("CONSTRAINT_INPUT_PASSED", input,
                             f"Constraint {self.constraint.name} started with value {input}")
         self.log.update_log("CONSTRAINT_STARTED", True,
                             f"Constraint {self.constraint.name} has started")
@@ -68,7 +68,7 @@ class Flag:
         self.status = ConstraintStatus.COMPLETE
         self.log.update_log("CONSTRAINT_COMPLETED", True,
                             f"Constraint {self.constraint.name} has completed")
-        self.log.update_log("OUTPUT_GENERATED", output,
+        self.log.update_log("CONSTRAINT_OUTPUT_GENERATED", output,
                             f"Constraint {self.constraint.name} completed with value {output}")
         self._set_end_time()
 

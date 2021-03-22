@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class StageEvents(Enum):
-    STARTED = 1
-    CONSTRAINT_STARTED = 2
-    CONSTRAINT_COMPLETED = 3
-    COMPLETED = 4
+    STAGE_STARTED = 1
+    STAGE_CONSTRAINT_STARTED = 2
+    STAGE_CONSTRAINT_COMPLETED = 3
+    STAGE_COMPLETED = 4
