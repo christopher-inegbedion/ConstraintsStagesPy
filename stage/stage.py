@@ -187,6 +187,15 @@ class StageGroup:
             else:
                 raise Exception("There are no stages in the stage group")
 
+    def set_task_for_constraint(self, constraint_name, task):
+        constraint = self.get_constraint(constraint_name)
+        constraint.set_task_instance(task)
+
+    def set_task_for_stage(self, stage_name, task):
+        stage = self._get_stage_with_name(stage_name)
+        for constraint in stage.constraints:
+            stage.set_task_for_constraint(constraint.name, task)
+
     def stop_stage(self, stage_name):
         stage = self._get_stage_with_name(stage_name)
         stage.stop()

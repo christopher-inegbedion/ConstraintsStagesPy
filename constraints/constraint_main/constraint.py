@@ -27,6 +27,7 @@ class Constraint(ABC):
         self.model = model  # constraint's model
         self.output = None  # constraint's output
         self.debug = debug  # determines if debug messages will be displayed
+        self.task_instance = None  # constraint's task
 
         # support for providing custom flags
         if flag is not None:
@@ -103,6 +104,14 @@ class Constraint(ABC):
         """Pause the constraint"""
         if self.get_status() == ConstraintStatus.ACTIVE:
             self.model.pause()
+
+    def get_task_instance(self):
+        """Return the constraint's task instance"""
+        return self.task_instance
+
+    def set_task_instance(self, task):
+        """Sets the constraint's Task"""
+        self.task_instance = task
 
     def get_status(self) -> ConstraintStatus:
         return self.flag.status
