@@ -64,6 +64,10 @@ class Stage(Observer):
         self.running_constraints.clear()
         self.status = StageStatus.COMPLETE
 
+    def set_task_for_constraint(self, constraint_name, task):
+        constraint = self.get_constraint(constraint_name)
+        constraint.set_task_instance(task)
+
     def get_constraint(self, name):
         """Find a constraint in the stage"""
         for cnstrt in self.constraints:
