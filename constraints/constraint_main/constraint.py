@@ -278,6 +278,11 @@ class Constraint(ABC):
         print(stage.name)
         self.flag.log.attach(stage)
 
+        # Child constraint's have to be passed the stage object manually
+        if self.model.model_family == ModelFamily.COMBINED_CONSTRAINT:
+            for constraint in self.inputs:
+                constraint.set_stage(stage)
+
     def _raise_exception(self, exception_msg) -> Exception:
         self.flag.log_error(exception_msg)
         return Exception(exception_msg)
