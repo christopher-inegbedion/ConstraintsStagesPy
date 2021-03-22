@@ -1,8 +1,15 @@
+## v0.3-a (2020-03-22)
+- Added feature to log Constraint events
+- Stop specific/multiple Stages in StageGroup
+- Stop Constraint from Stage object
+- Stages/Constraints now each run in their thread
+
 ## v0.2-a (2020-02-28)
 - Bug fixes
 - Implement basic form of StageGroup
 - Pause a Constraint/Stage
 - Remove Stage from StageGroup
+  
 ## v0.1-a (2020-02-27)
 
 - **Initial version of Constraint/Stage system**
