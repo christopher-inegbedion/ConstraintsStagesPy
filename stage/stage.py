@@ -145,6 +145,10 @@ class Stage(Observer):
         """Stop a constraint"""
         self.get_constraint(constraint_name).model.abort()
 
+    def set_pipeline(self, pipeline):
+        self.pipeline = pipeline
+        self.log.attach(pipeline)
+
 
 class StageGroup:
     """A group of stages"""
@@ -215,7 +219,3 @@ class StageGroup:
     def stop_all(self):
         for stage in self.stages:
             stage.stop()
-
-    def set_pipeline(self, pipeline):
-        self.pipeline = pipeline
-        self.log.attach(pipeline)
