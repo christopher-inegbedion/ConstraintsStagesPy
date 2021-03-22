@@ -275,6 +275,7 @@ class Constraint(ABC):
 
     def set_stage(self, stage):
         self.stage = stage
+        print(stage.name)
         self.flag.log.attach(stage)
 
     def _raise_exception(self, exception_msg) -> Exception:
