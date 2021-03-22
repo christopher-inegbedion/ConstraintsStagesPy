@@ -15,7 +15,7 @@ from constraints.constraint_main.flag import Flag
 class Stage(Observer):
     """A collection of constraints"""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, display_log=False):
         self.name = name
         self.constraints: List[Constraint] = []
         self.stage_group: StageGroup = None
@@ -23,15 +23,15 @@ class Stage(Observer):
         self.has_constraint_started = False
         self.log = StageLog()
         self.pipeline = None
+        self._display_log = display_log
 
         # The current constraint running
         self.running_constraints: List[Constraint] = []
 
     def on_update(self, observer: ConstraintLog) -> None:
         """Notifies the Stage of a change in the Constraint"""
-        print(observer.most_recent_update)
-
-        return super().on_update(observer)
+        if self._display_log:
+            print(observer.most_recent_update)
 
     def start(self):
         """Create a new thread for the stage"""
