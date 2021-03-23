@@ -22,7 +22,7 @@ class StageLog:
 
     def notify(self):
         if self.pipeline is not None:
-            self.pipeline.on_update(self)
+            self.pipeline.update(self)
 
     def update_log(self, event, value, msg):
         if event in self.events:
