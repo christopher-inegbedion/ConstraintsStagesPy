@@ -20,7 +20,7 @@ class Stage(Observer):
         self.constraints: List[Constraint] = []
         self.stage_group: StageGroup = None
         self.status: StageStatus = StageStatus.NOT_STARTED
-        self.has_constraint_started = False
+        self.has_stage_started = False
         self.log = StageLog()
         self.pipeline = None
         self._display_log = display_log
@@ -46,6 +46,9 @@ class Stage(Observer):
             print(f">>{self.name} stage STARTED")
             self.log.update_log(
                 "STAGE_STARTED", True, f"Stage {self.name} has STARTED")
+            
+            if self.pipeline != None:
+                self.pipeline.current_stage = self
 
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
@@ -118,10 +121,10 @@ class Stage(Observer):
             self._complete()
 
     def upgrade_status(self):
-        if self.has_constraint_started is False:
+        if self.has_stage_started is False:
             if self.status == StageStatus.NOT_STARTED:
                 self.status = StageStatus.ACTIVE
-            self.has_constraint_started = True
+            self.has_stage_started = True
 
     def set_stage_group(self, stage_group):
         self.stage_group = stage_group
