@@ -44,11 +44,11 @@ class Stage(Observer):
 
         with self.stage_group.stage_thread_instance_lock:
             print(f">>{self.name} stage STARTED")
-            self.log.update_log(
-                "STAGE_STARTED", True, f"Stage {self.name} has STARTED")
-            
             if self.pipeline != None:
                 self.pipeline.current_stage = self
+
+            self.log.update_log(
+                "STAGE_STARTED", True, f"Stage {self.name} has STARTED")
 
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
