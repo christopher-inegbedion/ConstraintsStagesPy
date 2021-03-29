@@ -1,3 +1,4 @@
+from constraints.enums.stage_group_status import StageGroupEnum
 from stage.stage_log import StageLog
 from constraints.constraint_main.constraint_log import ConstraintLog
 import constraints
@@ -70,6 +71,7 @@ class Stage(Observer):
         """Complete the stage"""
         print(f">>{self.name} stage COMPLETE")
         self.running_constraints.clear()
+        self.stage_group.stage_complete(self.name)
         self.log.update_log(
             "STAGE_COMPLETED", True, f"Stage {self.name} has COMPLETED")
 
@@ -158,7 +160,7 @@ class StageGroup:
 
     def __init__(self):
         self.stages: List[Stage] = []
-        self.status = None
+        self.status = StageGroupEnum.NOT_STARTED
         self.current_stage = "None"
 
         self.stage_threads = []
@@ -189,6 +191,7 @@ class StageGroup:
     def start(self, stage_name=""):
         """Start a stage given its name"""
 
+        self.status = StageGroupEnum.RUNNING
         if stage_name == "":
             if len(self.stages) > 0:
                 # TODO: Make the start function for the Stages async so they launch when the previous stage is complete.
@@ -205,6 +208,13 @@ class StageGroup:
                     raise Exception(f"The stage:'{stage_name}' does not exist")
             else:
                 raise Exception("There are no stages in the stage group")
+
+    def stage_complete(self, stage_name):
+        stage = self._get_stage_with_name(stage_name)
+        for i in range(len(self.stages)):
+            if self.stages[i].name == stage.name:
+                if i == len(self.stages)-1 and stage.status == StageStatus.COMPLETE:
+                    self.status = StageGroupEnum.COMPLETE
 
     def set_task_for_constraint(self, constraint_name, task):
         constraint = self.get_constraint(constraint_name)
