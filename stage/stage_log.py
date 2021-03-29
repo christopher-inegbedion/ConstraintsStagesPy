@@ -28,7 +28,8 @@ class StageLog:
         if event in self.events:
             self.events[event] = {"value": value, "msg": msg}
             self.most_recent_update.clear()
-            self.most_recent_update = {event: {"value": value, "msg": msg}}
+            self.most_recent_update = {
+                "event": event, "value": value, "msg": msg}
             self.notify()
         else:
             raise Exception(f"Constraint event type '{event}' cannot be found")
