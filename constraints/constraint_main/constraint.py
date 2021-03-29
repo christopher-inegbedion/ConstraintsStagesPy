@@ -101,6 +101,7 @@ class Constraint(ABC):
 
         # begin the model
         self.model.run(self.inputs)
+        self.inputs.clear()
 
     def pause(self):
         """Pause the constraint"""
@@ -284,5 +285,6 @@ class Constraint(ABC):
                 constraint.set_stage(stage)
 
     def _raise_exception(self, exception_msg) -> Exception:
+        self.inputs.clear()
         self.flag.log_error(exception_msg)
         return Exception(exception_msg)
