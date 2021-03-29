@@ -212,9 +212,8 @@ class StageGroup:
     def stage_complete(self, stage_name):
         stage = self._get_stage_with_name(stage_name)
         for i in range(len(self.stages)):
-            if self.stages[i].name == stage.name:
-                if i == len(self.stages)-1 and stage.status == StageStatus.COMPLETE:
-                    self.status = StageGroupEnum.COMPLETE
+            if self.stages[i].name == stage.name and i == len(self.stages)-1:
+                self.status = StageGroupEnum.COMPLETE
 
     def set_task_for_constraint(self, constraint_name, task):
         constraint = self.get_constraint(constraint_name)
