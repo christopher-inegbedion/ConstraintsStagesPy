@@ -103,6 +103,10 @@ class Constraint(ABC):
         self.model.run(self.inputs)
         self.inputs.clear()
 
+    def get_model_input_type(self):
+        """Return the type of input required"""
+        return self.model.input_type
+
     def pause(self):
         """Pause the constraint"""
         if self.get_status() == ConstraintStatus.ACTIVE:
