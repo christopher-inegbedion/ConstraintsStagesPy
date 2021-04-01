@@ -49,7 +49,7 @@ class Stage(Observer):
                 self.pipeline.current_stage = self
 
             self.log.update_log(
-                "STAGE_STARTED", True, f"Stage {self.name} has STARTED")
+                "STAGE_STARTED", self.name, f"Stage {self.name} has STARTED")
 
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
@@ -73,7 +73,7 @@ class Stage(Observer):
         self.running_constraints.clear()
         self.stage_group.stage_complete(self.name)
         self.log.update_log(
-            "STAGE_COMPLETED", True, f"Stage {self.name} has COMPLETED")
+            "STAGE_COMPLETED", self.name, f"Stage {self.name} has COMPLETED")
 
         self.status = StageStatus.COMPLETE
 
