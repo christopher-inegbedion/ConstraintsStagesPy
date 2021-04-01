@@ -210,7 +210,7 @@ class Model:
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
         self.check_constraint_initial_input_enabled(inputs)
         self.constraint.stage.log.update_log(
-            "STAGE_CONSTRAINT_STARTED", True, f"[Stage: {self.constraint.stage.name}] Constraint named {self.constraint.name} with model: {self.name} has STARTED")
+            "STAGE_CONSTRAINT_STARTED", self.constraint.name, f"[Stage: {self.constraint.stage.name}] Constraint named {self.constraint.name} with model: {self.name} has STARTED")
 
     @abstractmethod
     def _complete(self, data, aborted=False):
@@ -239,7 +239,7 @@ class Model:
         self.save_output(data)
         self.constraint.flag.complete_constraint(data)
         self.constraint.stage.log.update_log(
-            "STAGE_CONSTRAINT_COMPLETED", True, f"[Stage: {self.constraint.stage.name}] Constraint {self.constraint.name} with model: {self.name} has COMPLETED")
+            "STAGE_CONSTRAINT_COMPLETED", self.constraint.name, f"[Stage: {self.constraint.stage.name}] Constraint {self.constraint.name} with model: {self.name} has COMPLETED")
 
     def save_output(self, data):
         self.output = data
