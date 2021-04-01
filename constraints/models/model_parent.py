@@ -250,5 +250,5 @@ class Model:
         self.constraint.output = data
 
     def _raise_exception(self, exception_msg) -> Exception:
-        self.flag.log_error(exception_msg)
+        self.constraint.flag.log_error(exception_msg)
         return Exception(exception_msg)
