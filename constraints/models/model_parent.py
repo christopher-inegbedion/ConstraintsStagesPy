@@ -237,7 +237,7 @@ class Model:
 
         # save model's output
         stage_log_representation = {
-            "name": self.name,
+            "name": self.constraint.name,
             "data": data
         }
         self.save_output(data)
