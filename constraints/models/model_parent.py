@@ -243,7 +243,7 @@ class Model:
         self.save_output(data)
         self.constraint.flag.complete_constraint(data)
         self.constraint.stage.log.update_log(
-            "STAGE_CONSTRAINT_COMPLETED", stage_log_representation, f"[Stage: {self.constraint.stage.name}] Constraint {self.constraint.name} with model: {self.name} has COMPLETED")
+            "STAGE_CONSTRAINT_COMPLETED", stage_log_representation, f"[Stage: {self.constraint.stage.name}] Constraint {self.constraint.name} with model: {self.name} has COMPLETED with output: {data}")
 
     def save_output(self, data):
         self.output = data
