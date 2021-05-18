@@ -11,6 +11,7 @@ import concurrent.futures
 import time
 from utils.update import Observable, Observer
 from constraints.constraint_main.flag import Flag
+import uuid
 
 
 class Stage(Observer):
@@ -156,9 +157,10 @@ class Stage(Observer):
 
 
 class StageGroup:
-    """A group of stages"""
+    """A StageGroup is a collection of Stages that can be commanded by the StageGroup to perform a command"""
 
     def __init__(self):
+        self.id = uuid.uuid4()
         self.stages: List[Stage] = []
         self.status = StageGroupEnum.NOT_STARTED
         self.current_stage = "None"
