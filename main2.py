@@ -4,8 +4,8 @@ from stage.stage import Stage, StageGroup
 from constraints.models.example_models.pause_thread import PauseModel
 from constraints.constraint_main.custom_constraint import CustomConstraint
 
-cons = CustomConstraint("con", InternetModel())
-cons1 = CustomConstraint("con2", TestModel())
+cons = CustomConstraint("con", "desc", InternetModel())
+cons1 = CustomConstraint("con2", "desc", TestModel())
 cons.add_input("EUR")
 cons.add_input("USD")
 cons1.add_input(1)

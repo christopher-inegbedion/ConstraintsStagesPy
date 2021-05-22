@@ -13,7 +13,7 @@ import logging
 class Constraint(ABC):
     """Abstract constraint class"""
 
-    def __init__(self, name: str, flag: Flag, model: Model, debug=False):
+    def __init__(self, name: str, description: str, flag: Flag, model: Model, debug=False):
         """Each constraint has a flag and model
 
         Flag :- The flag defines the properties for the constraint
@@ -21,7 +21,8 @@ class Constraint(ABC):
                  what it does and what it produces
 
         Order of operation :- [INPUT]start() -> [MODEL]model.run([INPUT]) -> [OUTPUT]complete(data)"""
-        self.name = name  # constraint name for debugging purposes
+        self.name = name  # constraint name
+        self.description = description  # constraint's description
         self.flag: Flag = flag  # constraint's flag
         self.inputs = []  # constraint's input(s)
         self.model = model  # constraint's model
