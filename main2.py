@@ -5,20 +5,27 @@ from constraints.models.example_models.pause_thread import PauseModel
 from constraints.constraint_main.custom_constraint import CustomConstraint
 
 cons = CustomConstraint("con", "desc", InternetModel())
-cons1 = CustomConstraint("con2", "desc", TestModel())
+cons1 = CustomConstraint("con2", "desc", InternetModel())
 cons.add_input("EUR")
 cons.add_input("USD")
-cons1.add_input(1)
+
+cons1.add_input("NGN")
+cons1.add_input("USD")
 
 s = Stage('s')
 s.add_constraint(cons)
-# s.add_constraint(cons1)
+s.add_constraint(cons1)
+
+# s2 = Stage("p")
+# s2.add_constraint(cons1)
 
 sg = StageGroup()
 sg.add_stage(s)
+# sg.add_stage(s2)
 
-sg.start()
+sg.start('s')
 s.start_constraint("con")
-# s.start_constraint("con2")
+s.start_constraint("con2")
+s.start_constraint("con")
 
 # print(cons.flag.log.events)
