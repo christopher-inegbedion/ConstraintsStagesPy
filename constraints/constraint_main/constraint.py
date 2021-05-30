@@ -280,6 +280,9 @@ class Constraint(ABC):
         print(
             f"[Constraint {self.name} cannot start. Its stage has not begun]")
 
+    def show_constraint_already_ran_error_msg(self):
+        print(f"[Constraint {self.name} cannot start. It has already run]")
+
     def set_stage(self, stage):
         self.stage = stage
         self.flag.log.attach(stage)

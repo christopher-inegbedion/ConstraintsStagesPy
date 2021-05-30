@@ -98,14 +98,17 @@ class Stage(Observer):
         time.sleep(0.25)
 
         # Start a constraint only if the stage is running
-        if self.status == StageStatus.ACTIVE and constraint not in self.running_constraints:
-            self.running_constraints.append(constraint)
+        if self.status == StageStatus.ACTIVE:
+            if constraint not in self.running_constraints:
+                self.running_constraints.append(constraint)
 
-            new_constraint = threading.Thread(
-                target=constraint.start, args=())
-            new_constraint.setName(constraint.name)
+                new_constraint = threading.Thread(
+                    target=constraint.start, args=())
+                new_constraint.setName(constraint.name)
 
-            new_constraint.start()
+                new_constraint.start()
+            else:
+                constraint.show_constraint_already_ran_error_msg()
         else:
             constraint.show_constraint_stage_not_active_err_msg()
 
