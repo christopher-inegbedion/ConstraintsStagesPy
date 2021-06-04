@@ -236,3 +236,22 @@ class StageGroup:
     def stop_all(self):
         for stage in self.stages:
             stage.stop()
+
+    def get_stage_group_details(self):
+        details = []
+        for stage in self.stages:
+            if stage.status == StageStatus.COMPLETE:
+                stage_data = {"stage_name": stage.name,
+                              "status": "complete", "constraint_data": []}
+                for con in stage.constraints:
+                    stage_data["constraint_data"].append(
+                        {"constraint_name": con.name, "data": con.model.output})
+                details.append(stage_data)
+            elif stage.status == StageStatus.ACTIVE:
+                stage_data = {"stage_name": stage.name,
+                              "status": "active", "constraint_data": []}
+                details.append(stage_data)
+            elif stage.status == StageStatus.NOT_STARTED:
+                stage_data = {"stage_name": stage.name,
+                              "status": "not_started", "constraint_data": []}
+        return details
