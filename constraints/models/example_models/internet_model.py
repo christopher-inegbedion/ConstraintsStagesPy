@@ -18,8 +18,9 @@ class InternetModel(Model):
         super().__init__(self.name, self.model_family, self.input_type,
                          self.input_mode, self.input_count, self.output_type)
 
-    def run(self, inputs):
+    def run(self, inputs: list, configuration_inputs={}):
         super().run(inputs)
+        print(configuration_inputs)
 
         base_currency = inputs[0]
         target_currency = inputs[1]

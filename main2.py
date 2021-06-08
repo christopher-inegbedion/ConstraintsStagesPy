@@ -28,8 +28,8 @@ cons1 = constraints["con2"]
 cons.add_input("EUR")
 cons.add_input("USD")
 
-cons1.add_input("NGN")
-cons1.add_input("USD")
+# cons1.add_input("NGN")
+# cons1.add_input("USD")
 
 s = Stage('s')
 s.add_constraint(cons)
@@ -41,6 +41,8 @@ cons.add_input("USD")
 cons1 = constraints["con2"]
 cons1.add_input("EUR")
 cons1.add_input("USD")
+# cons1.add_configuration_input("data", "data")
+
 s2.add_constraint(cons)
 s2.add_constraint(cons1)
 
@@ -51,23 +53,13 @@ sg.add_stage(s2)
 
 # sg.start('s')
 
-
-def update(pipe, args):
-    print("update1")
-
-
-def update2(pipe, args):
-    print("update2")
-
 # s.start_constraint("con")
 # s.start_constraint("con2")
 
 
 pipe = Pipeline(Task("name", "desc"), sg)
-pipe.start()
-pipe.on_update(update)
-pipe.on_update(update2)
-pipe.start_constraint("s", "con")
+pipe.start_stage("s2")
+pipe.start_constraint("s2", "con2")
 print(sg.get_stage_group_details())
 # sleep(2)
 # pipe.start_constraint("s2", "con")

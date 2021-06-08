@@ -25,6 +25,7 @@ class Constraint(ABC):
         self.description = description  # constraint's description
         self.flag: Flag = flag  # constraint's flag
         self.inputs = []  # constraint's input(s)
+        self.configuration_inputs = {}  # constraint's configuration inputs
         self.model = model  # constraint's model
         self.output = None  # constraint's output
         self.debug = debug  # determines if debug messages will be displayed
@@ -63,7 +64,7 @@ class Constraint(ABC):
             logging.debug(f"[CONSTRAINT]: {self.name} running")
 
         if self.model.initial_input_required:
-            # Accept the inputs. Before the model is run the inputs provided have
+            # Accept the inputs. Before the model is run, the inputs provided have
             # to be verified for each input mode.
             # ---------------
 
@@ -84,7 +85,7 @@ class Constraint(ABC):
                 else:
                     if len(self.inputs) > self.model.input_count or len(self.inputs) < self.model.input_count:
                         raise self._raise_exception(
-                            INSUFFICIENT_AMOUNT_OF_INPUTS_ENTERED)
+                            INSUFFICIENT_AMOUNT_OF_INPUTS_ENTERED, extra_info=f"Inputs entered: {self.inputs}")
 
             # Input can be entered through the console and function calls. For this
             # input mode, the first input has to be a pre-defined value and the remaining
@@ -100,8 +101,24 @@ class Constraint(ABC):
 
             self.flag.start_constraint(self.inputs)
 
+        if self.model.configuration_input_required:
+            number_of_configuration_inputs = len(self.configuration_inputs)
+
+            if number_of_configuration_inputs == 0 and self.model.configuration_input_count == 99:
+                # This condition should not trigger an error, because keeping the configuration input count at the default
+                # 99 would mean that the model does not really need the configuration inputs, and a default value can be
+                # used in the case where the inputs are not entered
+                pass
+            elif number_of_configuration_inputs == 0 and self.model.configuration_input_count != 99:
+                raise self._raise_exception(INSUFFICIENT_CONFIGURATION_INPUTS_ENTERED,
+                                            extra_info=f"Required amount: {self.model.configuration_input_count}, amount provided: {number_of_configuration_inputs}, data: {self.configuration_inputs}")
+            elif number_of_configuration_inputs > self.model.configuration_input_count:
+                raise self._raise_exception(
+                    EXCESSIVE_CONFIGURATION_INPUTS_ENTERED)
+
         # begin the model
-        self.model.run(self.inputs)
+        self.model.run(
+            self.inputs, configuration_inputs=self.configuration_inputs)
         self.inputs.clear()
 
     def get_model_input_type(self):
@@ -276,6 +293,13 @@ class Constraint(ABC):
         else:
             raise self._raise_exception(INITIAL_INPUT_NOT_ENABLED)
 
+    def add_configuration_input(self, key, data):
+        if self.model.configuration_input_required:
+            self.configuration_inputs[key] = data
+        else:
+            raise self._raise_exception(
+                "This model does not require configuration data")
+
     def show_constraint_stage_not_active_err_msg(self):
         print(
             f"[Constraint {self.name} cannot start. Its stage has not begun]")
@@ -292,7 +316,7 @@ class Constraint(ABC):
             for constraint in self.inputs:
                 constraint.set_stage(stage)
 
-    def _raise_exception(self, exception_msg) -> Exception:
+    def _raise_exception(self, exception_msg, extra_info="") -> Exception:
         self.inputs.clear()
-        self.flag.log_error(exception_msg)
-        return Exception(exception_msg)
+        self.flag.log_error(exception_msg+extra_info)
+        return Exception(exception_msg+extra_info)

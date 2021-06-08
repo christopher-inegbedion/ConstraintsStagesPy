@@ -19,7 +19,7 @@ class TestModel(Model):
         super().__init__(self.name, self.model_family, self.input_type, self.input_mode, self.input_count,
                          self.output_type, initial_input_required=self.initial_input_required,)
 
-    def run(self, inputs: list):
+    def run(self, inputs: list, configuration_inputs={}):
         super().run(inputs)
 
         # input1 = self.request_input()

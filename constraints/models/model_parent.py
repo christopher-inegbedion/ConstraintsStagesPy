@@ -12,7 +12,7 @@ import logging
 class Model:
     def __init__(self, name: str, model_family: ModelFamily, input_type: InputType,
                  input_mode: ConstraintInputMode,
-                 input_count: int, output_type, initial_input_required=True):
+                 input_count: int, output_type, configuration_input_required=False, configuration_input_count=99, initial_input_required=True):
         """Abstract model class"""
         # the constraint that is utilizing the model
         self.constraint = None
@@ -26,6 +26,13 @@ class Model:
         # Determines if initial value input is required. A false value means the input_count param
         # is ignored by the model.
         self.initial_input_required = initial_input_required
+
+        # Determines if configuration values are required by the model. The type of input passed is not
+        # to be specified
+        self.configuration_input_required = configuration_input_required
+
+        # Specifies the amount of configuration inputs required
+        self.configuration_input_count = configuration_input_count
 
         # the type of input the model requires (CONSTRAINT, BOOL, INT, etc)
         self.input_type = input_type
@@ -123,7 +130,7 @@ class Model:
             return self.validate_and_add_pre_def_input(user_input)
 
     def pause(self, seconds):
-        """Pause the threads by the seconds arg."""
+        """Pause the threads by the specified duration [seconds]."""
         if type(seconds) != int:
             raise self._raise_exception(
                 "Invalid argument type passed (int type required)")
@@ -148,8 +155,8 @@ class Model:
         self.input_count = input_count
 
     def set_input_count_growable(self):
-        """Allows for an arbitrary number of inputs to be added and overwrite the
-        existing input count. This method can only be used for the PRE_DEF input mode,
+        """Allows for an arbitrary number of inputs to be added and overwrites the
+        existing input count if set. This method can only be used for the PRE_DEF input mode,
         other input modes need to have their input count specified."""
         if self.input_mode == ConstraintInputMode.PRE_DEF:
             self.growable = True
@@ -195,7 +202,7 @@ class Model:
         self.constraint.flag.initial_input_required = self.initial_input_required
 
     @abstractmethod
-    def run(self, inputs: list):
+    def run(self, inputs: list, configuration_inputs={}):
         """Method that works on the input(s) provided and produces output"""
         if self.constraint is None:
             raise self._raise_exception(CONSTRAINT_NOT_SET)

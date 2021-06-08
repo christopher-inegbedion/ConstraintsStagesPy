@@ -18,7 +18,7 @@ class VerificationModel(Model):
         super().__init__(self.name, self.model_family, self.input_type,
                          self.input_mode, self.input_count, self.output_type)
 
-    def run(self, inputs: list):
+    def run(self, inputs: list, configuration_inputs={}):
         super().run(inputs)
 
         keywords = inputs[0]
