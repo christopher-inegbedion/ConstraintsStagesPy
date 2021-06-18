@@ -12,7 +12,7 @@ import logging
 class Model:
     def __init__(self, name: str, model_family: ModelFamily, input_type: InputType,
                  input_mode: ConstraintInputMode,
-                 input_count: int, output_type, configuration_input_required=False, configuration_input_count=99, initial_input_required=True):
+                 input_count: int, output_type, configuration_input_required=False, configuration_input_count=99, initial_input_required=True, config_parameters=[]):
         """Abstract model class"""
         # the constraint that is utilizing the model
         self.constraint = None
@@ -33,6 +33,9 @@ class Model:
 
         # Specifies the amount of configuration inputs required
         self.configuration_input_count = configuration_input_count
+
+        # Paramters that correspond to each configuration input
+        self.config_parameters = config_parameters
 
         # the type of input the model requires (CONSTRAINT, BOOL, INT, etc)
         self.input_type = input_type

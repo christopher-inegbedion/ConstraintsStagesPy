@@ -31,6 +31,7 @@ class Constraint(ABC):
         self.debug = debug  # determines if debug messages will be displayed
         self.task_instance = None  # constraint's task
         self.stage = None
+        self._config_params_entered = 0
 
         # support for providing custom flags
         if flag is not None:
@@ -101,15 +102,16 @@ class Constraint(ABC):
 
             self.flag.start_constraint(self.inputs)
 
+        # Verify the model's configuration inputs
         if self.model.configuration_input_required:
             number_of_configuration_inputs = len(self.configuration_inputs)
 
             if number_of_configuration_inputs == 0 and self.model.configuration_input_count == 99:
-                # This condition should not trigger an error, because keeping the configuration input count at the default
-                # 99 would mean that the model does not really need the configuration inputs, and a default value can be
+                # This condition should not trigger an error, because keeping the configuration input count at the default 
+                # value -> 99 would mean that the model does not really need the configuration inputs, and a default value can be
                 # used in the case where the inputs are not entered
                 pass
-            elif number_of_configuration_inputs == 0 and self.model.configuration_input_count != 99:
+            elif number_of_configuration_inputs != self.model.configuration_input_count:
                 raise self._raise_exception(INSUFFICIENT_CONFIGURATION_INPUTS_ENTERED,
                                             extra_info=f"Required amount: {self.model.configuration_input_count}, amount provided: {number_of_configuration_inputs}, data: {self.configuration_inputs}")
             elif number_of_configuration_inputs > self.model.configuration_input_count:
@@ -284,6 +286,9 @@ class Constraint(ABC):
     def add_input(self, data):
         """Add input to the constraint. This method is only used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"""
 
+        if self.model.configuration_input_required and self.model.config_parameters == []:
+                raise Exception("Config parameters are required. ")
+
         if self.model.initial_input_required:
             if self.model.input_mode == ConstraintInputMode.PRE_DEF \
                     or self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
@@ -293,12 +298,14 @@ class Constraint(ABC):
         else:
             raise self._raise_exception(INITIAL_INPUT_NOT_ENABLED)
 
-    def add_configuration_input(self, key, data):
+    def add_configuration_input(self, data):
         if self.model.configuration_input_required:
-            self.configuration_inputs[key] = data
+            self.configuration_inputs[self.model.config_parameters[self._config_params_entered]] = data
         else:
             raise self._raise_exception(
                 "This model does not require configuration data")
+
+        self._config_params_entered +=1
 
     def show_constraint_stage_not_active_err_msg(self):
         print(

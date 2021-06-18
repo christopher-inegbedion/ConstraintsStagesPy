@@ -14,17 +14,12 @@ def createCon1():
 
 
 def createCon2():
-    return CustomConstraint("con2", "desc", InternetModel(), debug=False)
+    return CustomConstraint("con2", "desc", PauseModel(), debug=False)
 
-
-constraints = {
-    "con": createCon1(),
-    "con2": createCon2()
-}
 
 
 cons = createCon1()
-cons1 = constraints["con2"]
+cons1 = createCon2()
 cons.add_input("EUR")
 cons.add_input("USD")
 
@@ -38,10 +33,10 @@ s2 = Stage('s2')
 cons = createCon1()
 cons.add_input("EUR")
 cons.add_input("USD")
-cons1 = constraints["con2"]
-cons1.add_input("EUR")
-cons1.add_input("USD")
-# cons1.add_configuration_input("data", "data")
+cons1 = createCon2()
+cons1.add_input(1)
+cons.add_configuration_input("data")
+cons.add_configuration_input("dasta")
 
 s2.add_constraint(cons)
 s2.add_constraint(cons1)
@@ -60,7 +55,8 @@ sg.add_stage(s2)
 pipe = Pipeline(Task("name", "desc"), sg)
 pipe.start_stage("s2")
 pipe.start_constraint("s2", "con2")
-print(sg.get_stage_group_details())
+pipe.start_constraint("s2", "con")
+# print(sg.get_stage_group_details())
 # sleep(2)
 # pipe.start_constraint("s2", "con")
 

@@ -14,13 +14,13 @@ class InternetModel(Model):
         self.input_mode = ConstraintInputMode.PRE_DEF
         self.input_count = 2
         self.output_type = InputType.STRING
+        self.config_parameters = ["test", "test1"]
 
         super().__init__(self.name, self.model_family, self.input_type,
-                         self.input_mode, self.input_count, self.output_type)
+                         self.input_mode, self.input_count, self.output_type, configuration_input_count=2, configuration_input_required=True, config_parameters = self.config_parameters)
 
     def run(self, inputs: list, configuration_inputs={}):
         super().run(inputs)
-        print(configuration_inputs)
 
         base_currency = inputs[0]
         target_currency = inputs[1]
