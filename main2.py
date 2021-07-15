@@ -17,7 +17,6 @@ def createCon2():
     return CustomConstraint("con2", "desc", PauseModel(), debug=False)
 
 
-
 cons = createCon1()
 cons1 = createCon2()
 cons.add_input("EUR")
@@ -35,8 +34,8 @@ cons.add_input("EUR")
 cons.add_input("USD")
 cons1 = createCon2()
 cons1.add_input(1)
-cons.add_configuration_input("data")
-cons.add_configuration_input("dasta")
+cons.add_configuration_input("data", key="test1")
+cons.add_configuration_input("dasta", key="test")
 
 s2.add_constraint(cons)
 s2.add_constraint(cons1)

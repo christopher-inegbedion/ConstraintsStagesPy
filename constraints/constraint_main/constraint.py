@@ -107,7 +107,7 @@ class Constraint(ABC):
             number_of_configuration_inputs = len(self.configuration_inputs)
 
             if number_of_configuration_inputs == 0 and self.model.configuration_input_count == 99:
-                # This condition should not trigger an error, because keeping the configuration input count at the default 
+                # This condition should not trigger an error, because keeping the configuration input count at the default
                 # value -> 99 would mean that the model does not really need the configuration inputs, and a default value can be
                 # used in the case where the inputs are not entered
                 pass
@@ -287,7 +287,7 @@ class Constraint(ABC):
         """Add input to the constraint. This method is only used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"""
 
         if self.model.configuration_input_required and self.model.config_parameters == []:
-                raise Exception("Config parameters are required. ")
+            raise Exception("Config parameters are required. ")
 
         if self.model.initial_input_required:
             if self.model.input_mode == ConstraintInputMode.PRE_DEF \
@@ -298,14 +298,21 @@ class Constraint(ABC):
         else:
             raise self._raise_exception(INITIAL_INPUT_NOT_ENABLED)
 
-    def add_configuration_input(self, data):
+    def add_configuration_input(self, data, key=None):
         if self.model.configuration_input_required:
+            if key != None:
+                if key not in self.model.config_parameters:
+                    raise self._raise_exception(
+                        f"The key provided [{key}] is not a configuration parameter")
+
+                self.configuration_inputs[key] = data
+
             self.configuration_inputs[self.model.config_parameters[self._config_params_entered]] = data
         else:
             raise self._raise_exception(
                 "This model does not require configuration data")
 
-        self._config_params_entered +=1
+        self._config_params_entered += 1
 
     def show_constraint_stage_not_active_err_msg(self):
         print(
