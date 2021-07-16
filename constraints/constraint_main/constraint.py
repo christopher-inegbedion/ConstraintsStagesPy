@@ -309,8 +309,8 @@ class Constraint(ABC):
                         f"The key provided [{key}] is not a configuration parameter")
 
                 self.configuration_inputs[key] = data
-
-            self.configuration_inputs[self.model.config_parameters[self._config_params_entered]] = data
+            else:
+                self.configuration_inputs[self.model.config_parameters[self._config_params_entered]] = data
         else:
             raise self._raise_exception(
                 "This model does not require configuration data")
