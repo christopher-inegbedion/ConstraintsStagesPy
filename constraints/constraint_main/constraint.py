@@ -300,6 +300,9 @@ class Constraint(ABC):
 
     def add_configuration_input(self, data, key=None):
         if self.model.configuration_input_required:
+            if len(self.configuration_inputs) >= self.model.configuration_input_count:
+                raise self._raise_exception(
+                    f"The maximum number of configuration inputs have been entered. [Input entered: {data}] [Inputs: {self.configuration_inputs}]")
             if key != None:
                 if key not in self.model.config_parameters:
                     raise self._raise_exception(
