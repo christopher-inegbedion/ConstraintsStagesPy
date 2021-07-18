@@ -1,3 +1,4 @@
+from typing import Any
 from constraints.constraint_main.constraint_log import ConstraintLog
 from constraints.enums.constraint_status import ConstraintStatus
 from constraints.enums.model_family import ModelFamily
@@ -32,6 +33,8 @@ class Constraint(ABC):
         self.task_instance = None  # constraint's task
         self.stage = None
         self._config_params_entered = 0
+
+        self.external_action_func = None
 
         # support for providing custom flags
         if flag is not None:
@@ -320,6 +323,18 @@ class Constraint(ABC):
     def show_constraint_stage_not_active_err_msg(self):
         print(
             f"[Constraint {self.name} cannot start. Its stage has not begun]")
+
+    def notify_external_action(self, constraint_name: str, command: str, data: dict) -> Any:
+        """This method is run when a model request's input with the external_action(..) method"""
+        if self.external_action_func != None:
+            return self.external_action_func(constraint_name, command, data)
+        else:
+            err_msg = f"External action function not set for Constraint [{self.name}]."
+            raise self._raise_exception(err_msg)
+
+    def on_external_action(self, func, *args):
+        """Sets the function to be run when notify_external_action(..) method is called"""
+        self.external_action_func = func
 
     def show_constraint_already_ran_error_msg(self):
         print(f"[Constraint {self.name} cannot start. It has already run]")

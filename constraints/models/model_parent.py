@@ -123,14 +123,13 @@ class Model:
         elif self.input_type == InputType.ANY:  # any input (list)
             return data
 
-    def request_input(self, data=None):
+    def external_action(self, input_required: bool, constraint_name: str, command: str, data: dict):
         """Request input from the user"""
-        if data is None:
-            user_input = input("input: ")
-            return self.validate_and_add_user_input(user_input)
+        if input_required:
+            return self.constraint.notify_external_action(constraint_name, command, data)
         else:
-            user_input = data
-            return self.validate_and_add_pre_def_input(user_input)
+            self.constraint.notify_external_action(constraint_name, command, data)
+        # self.constraint.notify_external_action(component, command)
 
     def pause(self, seconds):
         """Pause the threads by the specified duration [seconds]."""
