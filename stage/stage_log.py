@@ -1,4 +1,4 @@
-from constraints.enums.stage_events import StageEvents
+from constraints.enums.stage_status import StageStatus
 
 
 class StageLog:
@@ -11,8 +11,8 @@ class StageLog:
         self.pipeline = None
 
     def _init(self):
-        for e in StageEvents:
-            self.events[e.name] = None
+        for e in StageStatus:
+            self.events[e] = None
 
     def attach(self, observer) -> None:
         self.pipeline = observer
@@ -24,7 +24,7 @@ class StageLog:
         if self.pipeline is not None:
             self.pipeline.update(self)
 
-    def update_log(self, event, value, msg):
+    def update_log(self, event: StageStatus, value, msg):
         if event in self.events:
             self.events[event] = {"value": value, "msg": msg}
             self.most_recent_update.clear()
@@ -32,4 +32,4 @@ class StageLog:
                 "event": event, "value": value, "msg": msg}
             self.notify()
         else:
-            raise Exception(f"Constraint event type '{event}' cannot be found")
+            raise Exception(f"Stage event type '{event}' cannot be found")

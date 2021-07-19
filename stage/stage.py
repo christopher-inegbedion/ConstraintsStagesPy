@@ -1,3 +1,5 @@
+import logging
+from os import stat
 from constraints.enums.stage_group_status import StageGroupEnum
 from stage.stage_log import StageLog
 from constraints.constraint_main.constraint_log import ConstraintLog
@@ -49,8 +51,7 @@ class Stage(Observer):
             if self.pipeline != None:
                 self.pipeline.current_stage = self
 
-            self.log.update_log(
-                "STAGE_STARTED", self.name, f"Stage {self.name} has STARTED")
+            self.set_status(StageStatus.ACTIVE, True)
 
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
@@ -73,10 +74,7 @@ class Stage(Observer):
         print(f">>{self.name} stage COMPLETE")
         self.running_constraints.clear()
         self.stage_group.stage_complete(self.name)
-        self.log.update_log(
-            "STAGE_COMPLETED", self.name, f"Stage {self.name} has COMPLETED")
-
-        self.status = StageStatus.COMPLETE
+        self.set_status(StageStatus.COMPLETE, True)
 
     def set_task_for_constraint(self, constraint_name, task):
         constraint = self.get_constraint(constraint_name)
@@ -91,20 +89,23 @@ class Stage(Observer):
         raise Exception("Constraint cannot be found")
 
     def start_constraint(self, name, debug=False):
-        """Start a new thread for a constraint"""
+        """Start a new constraint.
+
+        Each constraint runs in a seperate thread. This enables multiple constraints to be run at
+        the same time."""
         constraint = self.get_constraint(name)
 
         # this pause in the main thread is need to give time for the stage to begin
         time.sleep(0.25)
 
         # Start a constraint only if the stage is running
-        if self.status == StageStatus.ACTIVE:
+        if self.status != StageStatus.NOT_STARTED and self.status != StageStatus.COMPLETE:
             if constraint not in self.running_constraints:
                 self.running_constraints.append(constraint)
 
                 new_constraint = threading.Thread(
+                    name=constraint.name,
                     target=constraint.start, args=())
-                new_constraint.setName(constraint.name)
 
                 new_constraint.start()
             else:
@@ -113,24 +114,43 @@ class Stage(Observer):
             constraint.show_constraint_stage_not_active_err_msg()
 
     def stop(self):
-        """Stop a constraint"""
-        is_there_no_active_constraint = True
+        """Stop the stage and any active constraints"""
 
         for constraint in self.constraints:
             if constraint.get_status() == ConstraintStatus.ACTIVE:
-                is_there_no_active_constraint = False
                 self.stop_constraint(constraint.name)
 
         print(f">Stage: {self.name} is stopped.")
 
-        if is_there_no_active_constraint:
-            self._complete()
+        self._complete()
 
-    def upgrade_status(self):
-        if self.has_stage_started is False:
-            if self.status == StageStatus.NOT_STARTED:
-                self.status = StageStatus.ACTIVE
+    def set_status(self, status: StageStatus, data):
+        """Set the status of the Stage"""
+        logging.basicConfig(level=logging.DEBUG)
+
+        self.status = status
+        if status == StageStatus.ACTIVE:
+            msg = f"Stage {self.name} has started"
             self.has_stage_started = True
+            self.log.update_log(status, data, msg)
+        elif status == StageStatus.COMPLETE:
+            msg = f"Stage {self.name} has completed"
+            self.log.update_log(status, data, msg)
+        elif status == StageStatus.CONSTRAINT_STARTED:
+            msg = f"Stage [{self.name}]'s constraint [{data}] has started"
+            self.log.update_log(StageStatus.CONSTRAINT_STARTED, data, msg)
+        elif status == StageStatus.CONSTRAINT_COMPLETED:
+            msg = f"Stage [{self.name}]'s constraint [{data}] has completed"
+            self.log.update_log(StageStatus.CONSTRAINT_STARTED, data, msg)
+        else:
+            msg = f"StageStatus [{status}] has not been implemented"
+            self.log.update_log(StageStatus.ERROR, data, msg)
+
+        self._display_log_msg(msg)
+
+    def _display_log_msg(self, msg):
+        if self._display_log:
+            logging.debug(msg)
 
     def set_stage_group(self, stage_group):
         self.stage_group = stage_group
@@ -175,7 +195,6 @@ class StageGroup:
 
     def set_current_stage(self, current_stage: Stage):
         self.current_stage = current_stage
-        current_stage.upgrade_status()
 
     def _get_stage_with_name(self, stage_name: str) -> Stage:
         for stage in self.stages:

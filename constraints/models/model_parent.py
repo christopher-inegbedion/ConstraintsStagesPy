@@ -1,3 +1,5 @@
+from constraints.enums.stage_status import StageStatus
+from constraints.constraint_main.flag import Flag
 from constraints.enums.constraint_status import ConstraintStatus
 from constraints.exception_messages import *
 from abc import ABC, abstractmethod
@@ -62,8 +64,6 @@ class Model:
         # Preventing incompatible input modes and types
         self._perform_input_safety_check()
 
-    # Utility methods
-    # ---------------
     def validate_and_add_user_input(self, data):
         """This method validates the data provided by the constraint user. Used for USER input mode.
 
@@ -125,10 +125,16 @@ class Model:
 
     def external_action(self, input_required: bool, constraint_name: str, command: str, data: dict):
         """Request input from the user"""
+        constraint_flag: Flag = self.constraint.flag
+        constraint_flag.set_status(ConstraintStatus.PENDING_INPUT, True)
         if input_required:
-            return self.constraint.notify_external_action(constraint_name, command, data)
+            data = self.constraint.notify_external_action(
+                constraint_name, command, data)
+            constraint_flag.set_status(ConstraintStatus.RESUMED, data)
+            return data
         else:
-            self.constraint.notify_external_action(constraint_name, command, data)
+            self.constraint.notify_external_action(
+                constraint_name, command, data)
         # self.constraint.notify_external_action(component, command)
 
     def pause(self, seconds):
@@ -137,18 +143,20 @@ class Model:
             raise self._raise_exception(
                 "Invalid argument type passed (int type required)")
 
-        if self.constraint.flag.status == ConstraintStatus.ACTIVE:
+        if self.constraint.flag.status != ConstraintStatus.NOT_STARTED and self.constraint.flag.status != ConstraintStatus.COMPLETE:
+            self.constraint.flag.set_status(ConstraintStatus.PAUSED, seconds)
             time.sleep(seconds)
+        else:
+            self._raise_exception("A model can only be paused if it is active")
 
     def abort(self, msg=""):
         """Stop the constraint"""
         if self.constraint.flag.status == ConstraintStatus.ACTIVE:
-            if msg == "":
-                print(f"(x) MODEL: {self.name} aborted (x)")
-            else:
+            if msg != "":
                 print(msg)
         else:
-            print(f"[Constraint: {self.constraint.name} is not active.]")
+            print(
+                f"A model cannot be aborted if its Constraint is not active. [Constraint name: {self.constraint.name}]")
 
         self._complete(None, True)
 
@@ -209,17 +217,17 @@ class Model:
         if self.constraint is None:
             raise self._raise_exception(CONSTRAINT_NOT_SET)
 
-        if self.constraint.debug:
-            logging.basicConfig(
-                level=logging.DEBUG)
+        # if self.constraint.debug:
+        #     logging.basicConfig(
+        #         level=logging.DEBUG)
 
-            logging.debug(f"[MODEL]: {self.name} model running (Required input type: {self.input_type}, "
-                          f"Output type: {self.output_type})")
+        #     logging.debug(f"[MODEL]: {self.name} model running (Required input type: {self.input_type}, "
+        #                   f"Output type: {self.output_type})")
 
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
         self.check_constraint_initial_input_enabled(inputs)
-        self.constraint.stage.log.update_log(
-            "STAGE_CONSTRAINT_STARTED", self.constraint.name, f"[Stage: {self.constraint.stage.name}] Constraint named {self.constraint.name} with model: {self.name} has STARTED")
+        self.constraint.stage.set_status(
+            StageStatus.CONSTRAINT_STARTED, self.constraint.name)
 
     @abstractmethod
     def _complete(self, data, aborted=False):
@@ -230,10 +238,10 @@ class Model:
         if aborted or self.aborted:
             self.aborted = aborted
         else:
-            if self.constraint.debug:
-                logging.debug(
-                    f"[MODEL]: {self.name} model COMPLETE with output -> {data} ({self.constraint.name})")
-                print()
+            # if self.constraint.debug:
+            #     logging.debug(
+            #         f"[MODEL]: {self.name} model COMPLETE with output -> {data} ({self.constraint.name})")
+            # print()
 
             # ensure the output data is the same as the required output type
             if self.output_type == InputType.INT and type(data) != int:
@@ -251,8 +259,8 @@ class Model:
         }
         self.save_output(data)
         self.constraint.flag.complete_constraint(data)
-        self.constraint.stage.log.update_log(
-            "STAGE_CONSTRAINT_COMPLETED", stage_log_representation, f"[Stage: {self.constraint.stage.name}] Constraint {self.constraint.name} with model: {self.name} has COMPLETED with output: {data}")
+        self.constraint.stage.set_status(
+            StageStatus.CONSTRAINT_COMPLETED, self.constraint.name)
 
     def save_output(self, data):
         self.output = data

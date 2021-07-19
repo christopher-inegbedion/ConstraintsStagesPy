@@ -29,6 +29,7 @@ class KeywordModel(Model):
 
         self.external_action(True, "12", "qw", {})
         requested_input1 = self.external_action(True, "12", "qw", {})
+        self.pause(3)
         requested_input2 = self.external_action(True, "2", "", {})
         # print(int(requested_input1)*int(requested_input2))
 

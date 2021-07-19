@@ -1,17 +1,17 @@
 from constraints.models.example_models.keyword_model import KeywordModel
 from time import sleep, time
 
-from task_main.task import Task
+# from task_main.task import Task
 from constraints.models.example_models.internet_model import InternetModel
 from constraints.models.example_models.test_model import TestModel
 from stage.stage import Stage, StageGroup
 from constraints.models.example_models.pause_thread import PauseModel
 from constraints.constraint_main.custom_constraint import CustomConstraint
-from task_pipeline.pipeline import Pipeline
+# from task_pipeline.pipeline import Pipeline
 
 
 def createCon1():
-    return CustomConstraint("con", "desc", InternetModel(), debug=False)
+    return CustomConstraint("con", "desc", InternetModel(), debug=True)
 
 
 def createCon2():
@@ -19,7 +19,7 @@ def createCon2():
 
 
 def createCon3():
-    return CustomConstraint("con3", "desc", KeywordModel(), debug=False)
+    return CustomConstraint("con3", "desc", KeywordModel(), debug=True)
 
 
 def func(constraint_name, command, data):
@@ -43,6 +43,7 @@ cons3.on_external_action(func)
 # cons1.add_input("USD")
 
 s = Stage('s')
+# s.add_constraint(cons)
 s.add_constraint(cons3)
 
 # s2 = Stage('s2')
@@ -51,8 +52,8 @@ s.add_constraint(cons3)
 # cons.add_input("USD")
 # cons1 = createCon2()
 # cons1.add_input(1)
-# cons.add_configuration_input("data", key="test1")
-# cons.add_configuration_input("dasta", key="test")
+cons.add_configuration_input("data", key="test1")
+cons.add_configuration_input("dasta", key="test")
 
 # s2.add_constraint(cons)
 # s2.add_constraint(cons1)
@@ -60,6 +61,7 @@ s.add_constraint(cons3)
 sg = StageGroup()
 sg.add_stage(s)
 s.start()
+# s.start_constraint("con")
 s.start_constraint("con3")
 # sg.add_stage(s2)
 # sg.add_stage(s2)
@@ -70,7 +72,7 @@ s.start_constraint("con3")
 # s.start_constraint("con2")
 
 
-pipe = Pipeline(Task("name", "desc"), sg)
+# pipe = Pipeline(Task("name", "desc"), sg)
 # pipe.start_stage("s")
 # pipe.start_constraint("s", "con3")
 # pipe.start_constraint("s2", "con")

@@ -1,5 +1,5 @@
+from constraints.enums.constraint_status import ConstraintStatus
 from utils.update import Observable
-from constraints.enums.constraint_events import *
 
 
 class ConstraintLog(Observable):
@@ -12,8 +12,8 @@ class ConstraintLog(Observable):
         self.stage = None
 
     def _init(self):
-        for e in ConstraintEvents:
-            self.events[e.name] = None
+        for e in ConstraintStatus:
+            self.events[e] = None
 
     def attach(self, observer) -> None:
         self.stage = observer
@@ -25,7 +25,7 @@ class ConstraintLog(Observable):
         if self.stage is not None:
             self.stage.on_update(self)
 
-    def update_log(self, event, value, msg):
+    def update_log(self, event: ConstraintStatus, value, msg):
         if event in self.events:
             self.events[event] = {"value": value, "msg": msg}
             self.most_recent_update.clear()

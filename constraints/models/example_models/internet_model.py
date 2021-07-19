@@ -30,7 +30,7 @@ class InternetModel(Model):
         r = requests.get(addr)
         if r.status_code == 200:
             response = {"response": r.json()}
-            print(response["response"]["conversion_rate"])
+            # print(response["response"]["conversion_rate"])
         else:
             response = {"response": "failure"}
             print("failure")

@@ -63,9 +63,8 @@ class Constraint(ABC):
         # initialize the constraint's flag details.
 
         # display debug info.
-        if self.debug:
-            logging.basicConfig(level=logging.DEBUG)
-            logging.debug(f"[CONSTRAINT]: {self.name} running")
+        # if self.debug:
+        #     logging.debug(f"[CONSTRAINT]: {self.name} running")
 
         if self.model.initial_input_required:
             # Accept the inputs. Before the model is run, the inputs provided have
@@ -285,6 +284,7 @@ class Constraint(ABC):
                     MIXED_USER_PRE_DEF_FIRST_INPUT_MUST_BE_LIST)
 
             self.inputs.append(data)
+        self.flag.set_status(ConstraintStatus.INPUT_PASSED, data)
 
     def add_input(self, data):
         """Add input to the constraint. This method is only used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"""
@@ -329,7 +329,8 @@ class Constraint(ABC):
         if self.external_action_func != None:
             return self.external_action_func(constraint_name, command, data)
         else:
-            raise self._raise_exception(f"External action function not set for Constraint [{self.name}].")
+            raise self._raise_exception(
+                f"External action function not set for Constraint [{self.name}].")
 
     def on_external_action(self, func, *args):
         """Sets the function to be run when notify_external_action(..) method is called"""

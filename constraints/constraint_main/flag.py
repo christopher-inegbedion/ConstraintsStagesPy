@@ -1,3 +1,4 @@
+import logging
 import time
 
 from constraints.constraint_main.constraint_log import ConstraintLog
@@ -51,26 +52,74 @@ class Flag:
         self.constraint = constraint
 
     def log_error(self, err_msg):
-        self.log.update_log("CONSTRAINT_ERROR",
-                            True, err_msg)
+        self.set_status(ConstraintStatus.ERROR, None, custom_msg=err_msg)
+
+    def set_status(self, status: ConstraintStatus, data, custom_msg: str = ""):
+        """Sets the constraints status"""
+        logging.basicConfig(level=logging.DEBUG)
+
+        self.status = status
+        if status == ConstraintStatus.ACTIVE:
+            msg = f"Constraint [{self.constraint.name}] has started"
+            self.log.update_log(self.status, True,
+                                msg)
+            self._set_start_time()
+
+        elif status == ConstraintStatus.INPUT_PASSED:
+            msg = f"Constraint [{self.constraint.name}] has value [{data}] inputted."
+            self.log.update_log(self.status, data,
+                                msg)
+
+        elif status == ConstraintStatus.PENDING_INPUT:
+            msg = f"Constraint [{self.constraint.name}] with model [{self.constraint.model.name}] has requested input."
+            self.log.update_log(
+                self.status, True,
+                msg)
+
+        elif status == ConstraintStatus.PAUSED:
+            msg = f"Constraint [{self.constraint.name}] with model [{self.constraint.model.name}] has been paused."
+            self.log.update_log(
+                self.status, data, msg
+            )
+
+        elif status == ConstraintStatus.RESUMED:
+            msg = f"Constraint [{self.constraint.name}] has resumed"
+            self.log.update_log(
+                self.status, True, msg)
+
+        elif status == ConstraintStatus.COMPLETE:
+            msg = f"Constraint [{self.constraint.name}] has completed"
+            self.log.update_log(self.status, True,
+                                msg)
+            self._set_end_time()
+
+        elif status == ConstraintStatus.OUTPUT_PRODUCED:
+            msg = f"Constraint [{self.constraint.name}] completed with value {data}"
+            self.log.update_log(self.status, data,
+                                msg)
+
+        elif status == ConstraintStatus.ERROR:
+            msg = f"Constraint [{self.constraint.name}] encounterd an error"
+            if custom_msg != "":
+                msg = custom_msg
+            self.log.update_log(self.status, data, msg)
+        else:
+            msg = f"ConstraintStatus [{status}] has not been implemented"
+            self.log.update_log(ConstraintStatus.ERROR, None, msg)
+
+        self._display_debug_info(msg)
+
+    def _display_debug_info(self, msg):
+        if self.constraint.debug:
+            logging.debug(msg)
 
     def start_constraint(self, input):
         """Called when a constraint is begun"""
-        self.status = ConstraintStatus.ACTIVE
-        self.log.update_log("CONSTRAINT_INPUT_PASSED", input,
-                            f"Constraint {self.constraint.name} started with value {input}")
-        self.log.update_log("CONSTRAINT_STARTED", True,
-                            f"Constraint {self.constraint.name} has started")
-        self._set_start_time()
+        self.set_status(ConstraintStatus.ACTIVE, input)
 
     def complete_constraint(self, output):
         """Called when a constraint is completed"""
-        self.status = ConstraintStatus.COMPLETE
-        self.log.update_log("CONSTRAINT_COMPLETED", True,
-                            f"Constraint {self.constraint.name} has completed")
-        self.log.update_log("CONSTRAINT_OUTPUT_GENERATED", output,
-                            f"Constraint {self.constraint.name} completed with value {output}")
-        self._set_end_time()
+        self.set_status(ConstraintStatus.COMPLETE, output)
 
     def _set_start_time(self):
         """Set the UNIX timestamp for when the constraint begun"""
