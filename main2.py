@@ -42,7 +42,7 @@ cons3.on_external_action(func)
 # cons1.add_input("NGN")
 # cons1.add_input("USD")
 
-s = Stage('s')
+s = Stage('s', display_log=True)
 # s.add_constraint(cons)
 s.add_constraint(cons3)
 

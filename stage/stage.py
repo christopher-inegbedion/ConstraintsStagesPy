@@ -34,8 +34,9 @@ class Stage(Observer):
 
     def on_update(self, observer: ConstraintLog) -> None:
         """Notifies the Stage of a change in the Constraint"""
-        if self._display_log:
-            print(observer.most_recent_update)
+        # if self._display_log:
+        #     print(observer.most_recent_update)
+        pass
 
     def start(self):
         """Create a new thread for the stage"""
@@ -130,11 +131,11 @@ class Stage(Observer):
 
         self.status = status
         if status == StageStatus.ACTIVE:
-            msg = f"Stage {self.name} has started"
+            msg = f"Stage [{self.name}] has started"
             self.has_stage_started = True
             self.log.update_log(status, data, msg)
         elif status == StageStatus.COMPLETE:
-            msg = f"Stage {self.name} has completed"
+            msg = f"Stage [{self.name}] has completed"
             self.log.update_log(status, data, msg)
         elif status == StageStatus.CONSTRAINT_STARTED:
             msg = f"Stage [{self.name}]'s constraint [{data}] has started"
