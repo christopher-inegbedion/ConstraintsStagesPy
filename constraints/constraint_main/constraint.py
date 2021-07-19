@@ -329,8 +329,7 @@ class Constraint(ABC):
         if self.external_action_func != None:
             return self.external_action_func(constraint_name, command, data)
         else:
-            err_msg = f"External action function not set for Constraint [{self.name}]."
-            raise self._raise_exception(err_msg)
+            raise self._raise_exception(f"External action function not set for Constraint [{self.name}].")
 
     def on_external_action(self, func, *args):
         """Sets the function to be run when notify_external_action(..) method is called"""

@@ -17,7 +17,7 @@ class InternetModel(Model):
         self.config_parameters = ["test", "test1"]
 
         super().__init__(self.name, self.model_family, self.input_type,
-                         self.input_mode, self.input_count, self.output_type, configuration_input_count=2, configuration_input_required=True, config_parameters = self.config_parameters)
+                         self.input_mode, self.input_count, self.output_type, configuration_input_count=2, configuration_input_required=True, config_parameters=self.config_parameters)
 
     def run(self, inputs: list, configuration_inputs={}):
         super().run(inputs)
