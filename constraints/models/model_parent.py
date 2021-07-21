@@ -1,3 +1,5 @@
+import threading
+from constraints.enums.admin_status import AdminStatus
 from constraints.enums.stage_status import StageStatus
 from constraints.constraint_main.flag import Flag
 from constraints.enums.constraint_status import ConstraintStatus
@@ -14,7 +16,7 @@ import logging
 class Model:
     def __init__(self, name: str, model_family: ModelFamily, input_type: InputType,
                  input_mode: ConstraintInputMode,
-                 input_count: int, output_type, configuration_input_required=False, configuration_input_count=99, initial_input_required=True, config_parameters=[]):
+                 input_count: int, output_type, admin_session_independent=False, configuration_input_required=False, configuration_input_count=99, initial_input_required=True, config_parameters=[]):
         """Abstract model class"""
         # the constraint that is utilizing the model
         self.constraint = None
@@ -61,8 +63,13 @@ class Model:
         # Specifies if the model has been aborted
         self.aborted = False
 
+        # This property defines if the admin section can be active while the user is active
+        self.admin_session_independent = admin_session_independent
+
         # Preventing incompatible input modes and types
         self._perform_input_safety_check()
+
+        self.access_config_data_lock = threading.Lock()
 
     def validate_and_add_user_input(self, data):
         """This method validates the data provided by the constraint user. Used for USER input mode.
@@ -137,17 +144,52 @@ class Model:
                 constraint_name, command, data)
         # self.constraint.notify_external_action(component, command)
 
-    def pause(self, seconds):
+    def pause(self, seconds, admin=False):
         """Pause the threads by the specified duration [seconds]."""
         if type(seconds) != int:
             raise self._raise_exception(
                 "Invalid argument type passed (int type required)")
 
-        if self.constraint.flag.status != ConstraintStatus.NOT_STARTED and self.constraint.flag.status != ConstraintStatus.COMPLETE:
-            self.constraint.flag.set_status(ConstraintStatus.PAUSED, seconds)
-            time.sleep(seconds)
+        if admin != True:
+            if self.constraint.flag.status != ConstraintStatus.NOT_STARTED and self.constraint.flag.status != ConstraintStatus.COMPLETE:
+                self.constraint.flag.set_status(
+                    ConstraintStatus.PAUSED, seconds)
+            else:
+                self._raise_exception(
+                    "A model can only be paused if it is active")
         else:
-            self._raise_exception("A model can only be paused if it is active")
+            if self.constraint.admin_status == AdminStatus.ACTIVE:
+                self.constraint.admin_status = AdminStatus.PAUSED
+
+        time.sleep(seconds)
+        self._resume(admin)
+
+    def _set_configuration_input_value(self, key, data):
+        with self.access_config_data_lock:
+            self.constraint.notify_config_change(data)
+            self.constraint.configuration_inputs[key] = data
+
+    def _get_configuration_input_value(self, key):
+        with self.access_config_data_lock:
+            if key in self.constraint.configuration_inputs:
+                return self.constraint.configuration_inputs[key]
+            raise Exception(
+                f"Key [{key}] cannot be found in the configuration input")
+
+    def _resume(self, admin=False):
+        """This method resumes the model. This method aslo ensures that it is safe to resume"""
+
+        # The first check is to ensure that the admin section is not active. If it is the model will have
+        # to wait
+        while True:
+            if admin is False:
+                if self.constraint.admin_status != AdminStatus.ACTIVE:
+                    self.constraint.flag.set_status(
+                        ConstraintStatus.ACTIVE, True)
+                    break
+            else:
+                self.constraint.admin_status = AdminStatus.ACTIVE
+                break
 
     def abort(self, msg=""):
         """Stop the constraint"""
@@ -217,17 +259,16 @@ class Model:
         if self.constraint is None:
             raise self._raise_exception(CONSTRAINT_NOT_SET)
 
-        # if self.constraint.debug:
-        #     logging.basicConfig(
-        #         level=logging.DEBUG)
-
-        #     logging.debug(f"[MODEL]: {self.name} model running (Required input type: {self.input_type}, "
-        #                   f"Output type: {self.output_type})")
-
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
         self.check_constraint_initial_input_enabled(inputs)
         self.constraint.stage.set_status(
             StageStatus.CONSTRAINT_STARTED, self.constraint.name)
+
+    @abstractmethod
+    def run_admin(self):
+        """Method performs some work for the admin"""
+        if self.constraint is None:
+            raise self._raise_exception(CONSTRAINT_NOT_SET)
 
     @abstractmethod
     def _complete(self, data, aborted=False):

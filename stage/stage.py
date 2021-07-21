@@ -130,16 +130,23 @@ class Stage(Observer):
         logging.basicConfig(level=logging.DEBUG)
 
         self.status = status
+        # This status indicates that the Stage is active
         if status == StageStatus.ACTIVE:
             msg = f"Stage [{self.name}] has started"
             self.has_stage_started = True
             self.log.update_log(status, data, msg)
+
+        # All constraint's in the Stage has completed running
         elif status == StageStatus.COMPLETE:
             msg = f"Stage [{self.name}] has completed"
             self.log.update_log(status, data, msg)
+
+        # A constraint just begun
         elif status == StageStatus.CONSTRAINT_STARTED:
             msg = f"Stage [{self.name}]'s constraint [{data}] has started"
             self.log.update_log(StageStatus.CONSTRAINT_STARTED, data, msg)
+
+        # A constraint just completed
         elif status == StageStatus.CONSTRAINT_COMPLETED:
             msg = f"Stage [{self.name}]'s constraint [{data}] has completed"
             self.log.update_log(StageStatus.CONSTRAINT_STARTED, data, msg)
@@ -150,6 +157,7 @@ class Stage(Observer):
         self._display_log_msg(msg)
 
     def _display_log_msg(self, msg):
+        """Display the log message"""
         if self._display_log:
             logging.debug(msg)
 
@@ -188,8 +196,6 @@ class StageGroup:
         self.stages: List[Stage] = []
         self.status = StageGroupEnum.NOT_STARTED
         self.current_stage = "None"
-
-        self.stage_threads = []
 
         # allows for a single stage to be active at any time
         self.stage_thread_instance_lock = threading.Lock()

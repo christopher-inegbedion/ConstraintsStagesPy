@@ -1,3 +1,6 @@
+from time import sleep
+from constraints.enums.admin_status import AdminStatus
+import threading
 from typing import Any
 from constraints.constraint_main.constraint_log import ConstraintLog
 from constraints.enums.constraint_status import ConstraintStatus
@@ -21,20 +24,53 @@ class Constraint(ABC):
         Model :- The model defines what the constraint needs (i.e inputs),
                  what it does and what it produces
 
-        Order of operation :- [INPUT]start() -> [MODEL]model.run([INPUT]) -> [OUTPUT]complete(data)"""
-        self.name = name  # constraint name
-        self.description = description  # constraint's description
-        self.flag: Flag = flag  # constraint's flag
-        self.inputs = []  # constraint's input(s)
-        self.configuration_inputs = {}  # constraint's configuration inputs
-        self.model = model  # constraint's model
-        self.output = None  # constraint's output
-        self.debug = debug  # determines if debug messages will be displayed
-        self.task_instance = None  # constraint's task
+        Order of operation :- [INPUT]start() -> [MODEL]run([INPUT]) -> [OUTPUT]complete(data)
+
+        The admin model[start_admin()] can also be started """
+
+        # constraint name
+        self.name = name
+
+        # constraint's description
+        self.description = description
+
+        # constraint's flag
+        self.flag: Flag = flag
+
+        # constraint's input(s)
+        self.inputs = []
+
+        # constraint's configuration inputs
+        self.configuration_inputs = {}
+
+        # constraint's model
+        self.model = model
+
+        # constraint's output
+        self.output = None
+
+        # determines if debug messages will be displayed
+        self.debug = debug
+
+        # constraint's task
+        self.task_instance = None
+
+        # The constraint's current stage
         self.stage = None
+
+        # To keep track of the number of configuration inputs have been inputted
         self._config_params_entered = 0
 
+        # The status of the model's admin function
+        self.admin_status = AdminStatus.NOT_STARTED
+
+        # The function runs when the model calls the external action function. This is set
+        # with the on_external_action(..) function
         self.external_action_func = None
+
+        # This function runs when the self.confiuration_inputs variable is modified. This is
+        # set with the on_config_action(..) function
+        self.notify_config_action_func = None
 
         # support for providing custom flags
         if flag is not None:
@@ -62,10 +98,6 @@ class Constraint(ABC):
         self.debug = d
         # initialize the constraint's flag details.
 
-        # display debug info.
-        # if self.debug:
-        #     logging.debug(f"[CONSTRAINT]: {self.name} running")
-
         if self.model.initial_input_required:
             # Accept the inputs. Before the model is run, the inputs provided have
             # to be verified for each input mode.
@@ -76,7 +108,7 @@ class Constraint(ABC):
                 for input_count in range(self.model.input_count):
                     user_input = input("input: ")
                     # validate and add the input provided by the user
-                    self.validate_and_add_user_input(user_input)
+                    self._validate_and_add_user_input(user_input)
 
             # Input is entered through the use of function calls
             elif self.model.input_mode == ConstraintInputMode.PRE_DEF:
@@ -100,7 +132,7 @@ class Constraint(ABC):
                     for input_count in range(self.model.input_count-1):
                         user_input = input("input: ")
 
-                        self.validate_and_add_user_input(user_input)
+                        self._validate_and_add_user_input(user_input)
 
             self.flag.start_constraint(self.inputs)
 
@@ -123,7 +155,40 @@ class Constraint(ABC):
         # begin the model
         self.model.run(
             self.inputs, configuration_inputs=self.configuration_inputs)
+
+        # self.model.run_admin(self.inputs)
         self.inputs.clear()
+
+    def start_admin(self):
+        """This method starts the admin model. It can only be started after the main model function has started."""
+
+        # This is to prevent the model's main function and this function from colliding
+        # in the case where they are started at the same time
+        sleep(1)
+
+        # The model's admin function is run in a seperate thread to enable the
+        # model's main function and admin function run simultaneously
+        admin_func_thread = threading.Thread(target=self.model.run_admin,
+                                             name=f"{self.model.name}-Admin")
+
+        # The variable [self.model.admin_session_independent] describes whether the main
+        # function and the admin function can be active at the same time
+        main_model_status = self.flag.status
+        if self.model.admin_session_independent:
+            while True:
+                if main_model_status != ConstraintStatus.NOT_STARTED:
+                    main_model_status = AdminStatus.ACTIVE
+
+                    admin_func_thread.run()
+                    main_model_status = AdminStatus.COMPLETE
+                    break
+        else:
+            while True:
+                if main_model_status == ConstraintStatus.PAUSED and self.admin_status != AdminStatus.COMPLETE:
+                    self.admin_status = AdminStatus.ACTIVE
+                    admin_func_thread.run()
+                    self.admin_status = AdminStatus.COMPLETE
+                    break
 
     def get_model_input_type(self):
         """Return the type of input required"""
@@ -145,7 +210,7 @@ class Constraint(ABC):
     def get_status(self) -> ConstraintStatus:
         return self.flag.status
 
-    def validate_and_add_user_input(self, data):
+    def _validate_and_add_user_input(self, data):
         """This method validates the data provided by the constraint user. Used for USER input mode."""
         if self.model.input_type == InputType.BOOL:  # boolean input
             if data.lower() == "true":
@@ -203,7 +268,7 @@ class Constraint(ABC):
             # A constraint cannot be entered through the console
             pass
 
-    def validate_and_add_predef_input(self, data):
+    def _validate_and_add_predef_input(self, data):
         """This method validates the pre-defined data provided through function calls to the constraint.
          Used for PRE_DEF input mode."""
         if self.model.input_type == InputType.BOOL:  # bool input
@@ -286,20 +351,24 @@ class Constraint(ABC):
             self.inputs.append(data)
         self.flag.set_status(ConstraintStatus.INPUT_PASSED, data)
 
-    def add_input(self, data):
+    def add_input(self, data, admin=False):
         """Add input to the constraint. This method is only used if the input mode is PRE_DEF or MIXED_USER_PRE_DEF"""
 
-        if self.model.configuration_input_required and self.model.config_parameters == []:
-            raise Exception("Config parameters are required. ")
+        if admin is False:
+            if self.model.configuration_input_required and self.model.config_parameters == []:
+                raise Exception("Config parameters are required. ")
 
-        if self.model.initial_input_required:
-            if self.model.input_mode == ConstraintInputMode.PRE_DEF \
-                    or self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
-                self.validate_and_add_predef_input(data)
+            if self.model.initial_input_required:
+                if self.model.input_mode == ConstraintInputMode.PRE_DEF \
+                        or self.model.input_mode == ConstraintInputMode.MIXED_USER_PRE_DEF:
+                    self._validate_and_add_predef_input(data)
+                else:
+                    raise self._raise_exception(MANUAL_INPUT_NOT_ALLOWED)
             else:
-                raise self._raise_exception(MANUAL_INPUT_NOT_ALLOWED)
+                raise self._raise_exception(INITIAL_INPUT_NOT_ENABLED)
         else:
-            raise self._raise_exception(INITIAL_INPUT_NOT_ENABLED)
+            if data != None:
+                self.inputs.append(data)
 
     def add_configuration_input(self, data, key=None):
         if self.model.configuration_input_required:
@@ -326,15 +395,28 @@ class Constraint(ABC):
 
     def notify_external_action(self, constraint_name: str, command: str, data: dict) -> Any:
         """This method is run when a model request's input with the external_action(..) method"""
+
         if self.external_action_func != None:
             return self.external_action_func(constraint_name, command, data)
         else:
             raise self._raise_exception(
                 f"External action function not set for Constraint [{self.name}].")
 
-    def on_external_action(self, func, *args):
+    def on_external_action(self, func):
         """Sets the function to be run when notify_external_action(..) method is called"""
+
         self.external_action_func = func
+
+    def on_config_action(self, func, *args):
+        """Sets the function to be run when notify_config_change(..) method is called"""
+
+        self.notify_config_action_func = func
+
+    def notify_config_change(self, data):
+        """This method is called when a value is modified in the self.configuration_inputs dict is modified."""
+        if self.notify_config_action_func == None:
+            raise Exception("notify_config_action_func not set")
+        self.notify_config_action_func(data)
 
     def show_constraint_already_ran_error_msg(self):
         print(f"[Constraint {self.name} cannot start. It has already run]")
@@ -349,6 +431,7 @@ class Constraint(ABC):
                 constraint.set_stage(stage)
 
     def _raise_exception(self, exception_msg, extra_info="") -> Exception:
+        """Raias"""
         self.inputs.clear()
         self.flag.log_error(exception_msg+extra_info)
         return Exception(exception_msg+extra_info)
