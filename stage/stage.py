@@ -52,7 +52,7 @@ class Stage(Observer):
             if self.pipeline != None:
                 self.pipeline.current_stage = self
 
-            self.set_status(StageStatus.ACTIVE, True)
+            self.set_status(StageStatus.ACTIVE, self.name)
 
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
@@ -75,7 +75,7 @@ class Stage(Observer):
         print(f">>{self.name} stage COMPLETE")
         self.running_constraints.clear()
         self.stage_group.stage_complete(self.name)
-        self.set_status(StageStatus.COMPLETE, True)
+        self.set_status(StageStatus.COMPLETE, self.name)
 
     def set_task_for_constraint(self, constraint_name, task):
         constraint = self.get_constraint(constraint_name)
