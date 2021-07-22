@@ -134,7 +134,6 @@ class Constraint(ABC):
 
                         self._validate_and_add_user_input(user_input)
 
-            self.flag.start_constraint(self.inputs)
 
         # Verify the model's configuration inputs
         if self.model.configuration_input_required:
@@ -152,6 +151,8 @@ class Constraint(ABC):
                 raise self._raise_exception(
                     EXCESSIVE_CONFIGURATION_INPUTS_ENTERED)
 
+        self.flag.start_constraint(self.inputs)
+        
         # begin the model
         self.model.run(
             self.inputs, configuration_inputs=self.configuration_inputs)

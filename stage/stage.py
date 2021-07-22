@@ -133,26 +133,23 @@ class Stage(Observer):
         if status == StageStatus.ACTIVE:
             msg = f"Stage [{self.name}] has started"
             self.has_stage_started = True
-            self.log.update_log(status, data, msg)
 
         # All constraint's in the Stage has completed running
         elif status == StageStatus.COMPLETE:
             msg = f"Stage [{self.name}] has completed"
-            self.log.update_log(status, data, msg)
 
         # A constraint just begun
         elif status == StageStatus.CONSTRAINT_STARTED:
             msg = f"Stage [{self.name}]'s constraint [{data}] has started"
-            self.log.update_log(StageStatus.CONSTRAINT_STARTED, data, msg)
 
         # A constraint just completed
         elif status == StageStatus.CONSTRAINT_COMPLETED:
             msg = f"Stage [{self.name}]'s constraint [{data}] has completed"
-            self.log.update_log(StageStatus.CONSTRAINT_STARTED, data, msg)
         else:
             msg = f"StageStatus [{status}] has not been implemented"
-            self.log.update_log(StageStatus.ERROR, data, msg)
+            status = StageStatus.ERROR
 
+        self.log.update_log(status, data, msg)
         self._display_log_msg(msg)
 
     def _display_log_msg(self, msg):
