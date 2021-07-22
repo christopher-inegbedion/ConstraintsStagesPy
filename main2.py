@@ -16,7 +16,7 @@ def createCon1():
 
 
 def createCon2():
-    return CustomConstraint("con2", "desc", ChatModel(), debug=False)
+    return CustomConstraint("con2", "desc", ChatModel(), debug=True)
 
 
 def createCon3():
@@ -61,7 +61,8 @@ s.add_constraint(cons1)
 
 sg = StageGroup()
 sg.add_stage(s)
-s.start()
+sg.start()
+# s.start()
 # s.start_constraint("con")
 s.start_constraint("con2")
 s.get_constraint("con2").start_admin()

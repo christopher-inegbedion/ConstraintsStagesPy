@@ -127,7 +127,6 @@ class Stage(Observer):
 
     def set_status(self, status: StageStatus, data):
         """Set the status of the Stage"""
-        logging.basicConfig(level=logging.DEBUG)
 
         self.status = status
         # This status indicates that the Stage is active
@@ -159,7 +158,7 @@ class Stage(Observer):
     def _display_log_msg(self, msg):
         """Display the log message"""
         if self._display_log:
-            logging.debug(msg)
+            print(msg)
 
     def set_stage_group(self, stage_group):
         self.stage_group = stage_group

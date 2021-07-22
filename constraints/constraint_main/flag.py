@@ -56,8 +56,6 @@ class Flag:
 
     def set_status(self, status: ConstraintStatus, data, custom_msg: str = ""):
         """Sets the constraints status"""
-        logging.basicConfig(level=logging.DEBUG)
-
         self.status = status
         if status == ConstraintStatus.ACTIVE:
             msg = f"Constraint [{self.constraint.name}] has started"
@@ -111,7 +109,7 @@ class Flag:
 
     def _display_debug_info(self, msg):
         if self.constraint.debug:
-            logging.debug(msg)
+            print(msg)
 
     def start_constraint(self, input):
         """Called when a constraint is begun"""
