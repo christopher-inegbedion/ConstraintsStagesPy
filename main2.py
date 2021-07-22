@@ -16,37 +16,40 @@ def createCon1():
 
 
 def createCon2():
-    return CustomConstraint("con2", "desc", ChatModel(), debug=True)
+    return CustomConstraint("con2", "desc", ChatModel(), debug=False)
 
 
 def createCon3():
     return CustomConstraint("con3", "desc", KeywordModel(), debug=True)
 
 
-def func(constraint_name, command, data):
+def func(constraint_name, command, data, args):
+    print(args)
     return input("msg: ")
+
 
 def func1(data):
     print(data)
+
 
 cons = createCon1()
 cons1 = createCon2()
 cons3 = createCon3()
 cons1.add_input("EUR")
 cons1.add_input("USD")
-cons1.on_external_action(func)
+cons1.on_external_action(func, "sdf", "qd")
 cons1.on_config_action(func1)
 cons3.add_input("sd")
 # cons3.add_configuration_input("sds", "passcode")
 cons3.add_configuration_input("sds",)
-cons3.on_external_action(func)
+cons3.on_external_action(func, "sdf", "qd")
 # cons3.add_configuration_input("sds")
 
 
 # cons1.add_input("NGN")
 # cons1.add_input("USD")
 
-s = Stage('s', display_log=True)
+s = Stage('s', display_log=False)
 # s.add_constraint(cons)
 s.add_constraint(cons1)
 
@@ -94,7 +97,6 @@ s.get_constraint("con2").start_admin()
 # sleep(1)
 # cons.add_input("EUR")
 # cons.add_input("USD")
-
 # cons1.add_input("NGN")
 # cons1.add_input("USD")
 # print()

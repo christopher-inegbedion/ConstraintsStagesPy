@@ -68,6 +68,8 @@ class Constraint(ABC):
         # with the on_external_action(..) function
         self.external_action_func = None
 
+        self.external_action_args = None
+
         # This function runs when the self.confiuration_inputs variable is modified. This is
         # set with the on_config_action(..) function
         self.notify_config_action_func = None
@@ -398,15 +400,16 @@ class Constraint(ABC):
         """This method is run when a model request's input with the external_action(..) method"""
 
         if self.external_action_func != None:
-            return self.external_action_func(constraint_name, command, data)
+            return self.external_action_func(constraint_name, command, data, self.external_action_args)
         else:
             raise self._raise_exception(
                 f"External action function not set for Constraint [{self.name}].")
 
-    def on_external_action(self, func):
+    def on_external_action(self, func, *args):
         """Sets the function to be run when notify_external_action(..) method is called"""
 
         self.external_action_func = func
+        self.external_action_args = args
 
     def on_config_action(self, func, *args):
         """Sets the function to be run when notify_config_change(..) method is called"""
