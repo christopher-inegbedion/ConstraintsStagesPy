@@ -271,6 +271,11 @@ class Model:
             raise self._raise_exception(CONSTRAINT_NOT_SET)
 
     @abstractmethod
+    def listen(self, msg, data):
+        self.constraint.listen_msg = None
+        self.constraint.listen_data = None
+
+    @abstractmethod
     def _complete(self, data, aborted=False):
         """Method that ends the constraint.
         'aborted' argument is True if the model was aborted

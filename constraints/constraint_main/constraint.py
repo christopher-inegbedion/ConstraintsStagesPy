@@ -74,6 +74,9 @@ class Constraint(ABC):
         # set with the on_config_action(..) function
         self.notify_config_action_func = None
 
+        self.listen_msg = None
+        self.listen_data = None
+
         # support for providing custom flags
         if flag is not None:
             self.flag = flag
@@ -136,7 +139,6 @@ class Constraint(ABC):
 
                         self._validate_and_add_user_input(user_input)
 
-
         # Verify the model's configuration inputs
         if self.model.configuration_input_required:
             number_of_configuration_inputs = len(self.configuration_inputs)
@@ -154,7 +156,7 @@ class Constraint(ABC):
                     EXCESSIVE_CONFIGURATION_INPUTS_ENTERED)
 
         self.flag.start_constraint(self.inputs)
-        
+
         # begin the model
         self.model.run(
             self.inputs, configuration_inputs=self.configuration_inputs)
@@ -192,6 +194,20 @@ class Constraint(ABC):
                     admin_func_thread.run()
                     self.admin_status = AdminStatus.COMPLETE
                     break
+
+    def start_listen(self):
+        threading.Thread(target=self._start_listen, daemon=True).start()
+
+    def _start_listen(self):
+        while True:
+            self.model.listen(self.listen_msg, self.listen_data)
+
+    def get_listen_msg(self):
+        return self.listen_msg
+
+    def send_listen_data(self, msg: str, data):
+        self.listen_msg = msg
+        self.listen_data = data
 
     def get_model_input_type(self):
         """Return the type of input required"""
@@ -418,9 +434,8 @@ class Constraint(ABC):
 
     def notify_config_change(self, data):
         """This method is called when a value is modified in the self.configuration_inputs dict is modified."""
-        if self.notify_config_action_func == None:
-            raise Exception("notify_config_action_func not set")
-        self.notify_config_action_func(data)
+        if self.notify_config_action_func != None:
+            self.notify_config_action_func(data)
 
     def show_constraint_already_ran_error_msg(self):
         print(f"[Constraint {self.name} cannot start. It has already run]")

@@ -48,5 +48,15 @@ class ChatModel(Model):
             print(
                 f'admin msg: {self._get_configuration_input_value("admin_msg")}')
 
+    def listen(self, msg, data):
+        if msg == "user":
+            self._set_configuration_input_value("user_data", data)
+            print(self._get_configuration_input_value("user_data"))
+        elif msg == "admin":
+            self._set_configuration_input_value("admin_data", data)
+            print(self._get_configuration_input_value("admin_data"))
+
+        super().listen(msg, data)
+
     def _complete(self, data, aborted=False):
         super()._complete(data, aborted)

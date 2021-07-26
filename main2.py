@@ -1,6 +1,8 @@
+from multiprocessing.spawn import freeze_support
 from constraints.models.example_models.chat_model import ChatModel
 from constraints.models.example_models.keyword_model import KeywordModel
 from time import sleep, time
+from multiprocessing import Process
 
 # from task_main.task import Task
 from constraints.models.example_models.internet_model import InternetModel
@@ -38,7 +40,7 @@ cons3 = createCon3()
 cons1.add_input("EUR")
 cons1.add_input("USD")
 cons1.on_external_action(func, "sdf", "qd")
-cons1.on_config_action(func1)
+# cons1.on_config_action(func1)
 cons3.add_input("sd")
 # cons3.add_configuration_input("sds", "passcode")
 cons3.add_configuration_input("sds",)
@@ -67,8 +69,13 @@ sg.add_stage(s)
 sg.start()
 # s.start()
 # s.start_constraint("con")
-s.start_constraint("con2")
-s.get_constraint("con2").start_admin()
+con = s.get_constraint("con2")
+con.start_listen()
+# sleep(1)
+con.send_listen_data("user", "user_msg")
+# s.start_constraint("con2")
+# s.get_constraint("con2").start_admin()
+
 # sg.add_stage(s2)
 # sg.add_stage(s2)
 
