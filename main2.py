@@ -30,8 +30,9 @@ def func(constraint_name, command, data, args):
     return input("msg: ")
 
 
-def func1(data):
+def func1(data, args):
     print(data)
+    # pass
 
 
 cons = createCon1()
@@ -40,7 +41,7 @@ cons3 = createCon3()
 cons1.add_input("EUR")
 cons1.add_input("USD")
 cons1.on_external_action(func, "sdf", "qd")
-# cons1.on_config_action(func1)
+cons1.on_config_action(func1)
 cons3.add_input("sd")
 # cons3.add_configuration_input("sds", "passcode")
 cons3.add_configuration_input("sds",)
@@ -70,9 +71,11 @@ sg.start()
 # s.start()
 # s.start_constraint("con")
 con = s.get_constraint("con2")
-con.start_listen()
+# con.start_listen()
 # sleep(1)
-con.send_listen_data("user", "user_msg")
+con.send_listen_data("user", "hello")
+con.send_listen_data("admin", "hi")
+con.send_listen_data("user", "how are u")
 # s.start_constraint("con2")
 # s.get_constraint("con2").start_admin()
 

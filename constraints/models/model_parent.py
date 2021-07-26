@@ -166,15 +166,15 @@ class Model:
 
     def _set_configuration_input_value(self, key, data):
         with self.access_config_data_lock:
-            self.constraint.notify_config_change(data)
+            self.constraint.notify_config_change(
+                self.constraint.configuration_inputs)
             self.constraint.configuration_inputs[key] = data
 
     def _get_configuration_input_value(self, key):
         with self.access_config_data_lock:
             if key in self.constraint.configuration_inputs:
                 return self.constraint.configuration_inputs[key]
-            raise Exception(
-                f"Key [{key}] cannot be found in the configuration input")
+            return None
 
     def _resume(self, admin=False):
         """This method resumes the model. This method aslo ensures that it is safe to resume"""

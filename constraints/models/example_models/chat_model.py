@@ -1,3 +1,4 @@
+from time import sleep
 from constraints.constraint_main.constraint import Constraint
 from constraints.enums.constraint_input_mode import ConstraintInputMode
 from constraints.enums.input_type import InputType
@@ -50,13 +51,17 @@ class ChatModel(Model):
 
     def listen(self, msg, data):
         if msg == "user":
-            self._set_configuration_input_value("user_data", data)
-            print(self._get_configuration_input_value("user_data"))
+            print(self._get_configuration_input_value("user_data"),
+                  self._get_configuration_input_value("admin_data"))
+            self._set_configuration_input_value(
+                "user_data", data)
         elif msg == "admin":
-            self._set_configuration_input_value("admin_data", data)
-            print(self._get_configuration_input_value("admin_data"))
+            print(self._get_configuration_input_value("admin_data"),
+                  self._get_configuration_input_value("user_data"))
+            self._set_configuration_input_value(
+                "admin_data", data)
 
-        super().listen(msg, data)
+        self.constraint.listen_msg = None
 
     def _complete(self, data, aborted=False):
         super()._complete(data, aborted)

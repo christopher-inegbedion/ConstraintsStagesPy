@@ -76,6 +76,7 @@ class Constraint(ABC):
 
         self.listen_msg = None
         self.listen_data = None
+        self.listen_msg_lock = threading.Lock()
 
         # support for providing custom flags
         if flag is not None:
@@ -195,12 +196,13 @@ class Constraint(ABC):
                     self.admin_status = AdminStatus.COMPLETE
                     break
 
-    def start_listen(self):
-        threading.Thread(target=self._start_listen, daemon=True).start()
+    # def start_listen(self):
+    #     threading.Thread(target=self._start_listen, daemon=True).start()
 
-    def _start_listen(self):
-        while True:
-            self.model.listen(self.listen_msg, self.listen_data)
+    # def _start_listen(self):
+    #     while True:
+    #         with self.listen_msg_lock:
+    #             self.model.listen()
 
     def get_listen_msg(self):
         return self.listen_msg
@@ -208,6 +210,7 @@ class Constraint(ABC):
     def send_listen_data(self, msg: str, data):
         self.listen_msg = msg
         self.listen_data = data
+        self.model.listen(msg, data)
 
     def get_model_input_type(self):
         """Return the type of input required"""
@@ -431,11 +434,13 @@ class Constraint(ABC):
         """Sets the function to be run when notify_config_change(..) method is called"""
 
         self.notify_config_action_func = func
+        self.notify_config_action_args = args
 
     def notify_config_change(self, data):
         """This method is called when a value is modified in the self.configuration_inputs dict is modified."""
         if self.notify_config_action_func != None:
-            self.notify_config_action_func(data)
+            self.notify_config_action_func(
+                data, self.notify_config_action_args)
 
     def show_constraint_already_ran_error_msg(self):
         print(f"[Constraint {self.name} cannot start. It has already run]")
