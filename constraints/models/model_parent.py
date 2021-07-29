@@ -164,11 +164,15 @@ class Model:
         time.sleep(seconds)
         self._resume(admin)
 
+    def _notify_config_input_change(self):
+        self.constraint.notify_config_change(
+            self.constraint.configuration_inputs)
+
     def _set_configuration_input_value(self, key, data):
         with self.access_config_data_lock:
             self.constraint.configuration_inputs[key] = data
-            self.constraint.notify_config_change(
-                self.constraint.configuration_inputs)
+            # self.constraint.notify_config_change(
+            #     self.constraint.configuration_inputs)
 
     def _get_configuration_input_value(self, key):
         with self.access_config_data_lock:
