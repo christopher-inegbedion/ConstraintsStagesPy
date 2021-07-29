@@ -166,9 +166,9 @@ class Model:
 
     def _set_configuration_input_value(self, key, data):
         with self.access_config_data_lock:
+            self.constraint.configuration_inputs[key] = data
             self.constraint.notify_config_change(
                 self.constraint.configuration_inputs)
-            self.constraint.configuration_inputs[key] = data
 
     def _get_configuration_input_value(self, key):
         with self.access_config_data_lock:
