@@ -1,3 +1,4 @@
+from constraints.models.example_models.product_description_model import ProductDescriptionModel
 from multiprocessing.spawn import freeze_support
 from constraints.models.example_models.chat_model import ChatModel
 from constraints.models.example_models.keyword_model import KeywordModel
@@ -14,7 +15,7 @@ from constraints.constraint_main.custom_constraint import CustomConstraint
 
 
 def createCon1():
-    return CustomConstraint("con", "desc", InternetModel(), debug=True)
+    return CustomConstraint("con", "desc", ProductDescriptionModel(), debug=True)
 
 
 def createCon2():
@@ -38,14 +39,8 @@ def func1(data, args):
 cons = createCon1()
 cons1 = createCon2()
 cons3 = createCon3()
-cons1.add_input("EUR")
-cons1.add_input("USD")
-cons1.on_external_action(func, "sdf", "qd")
-cons1.on_config_action(func1)
-cons3.add_input("sd")
+
 # cons3.add_configuration_input("sds", "passcode")
-cons3.add_configuration_input("sds",)
-cons3.on_external_action(func, "sdf", "qd")
 # cons3.add_configuration_input("sds")
 
 
@@ -54,7 +49,7 @@ cons3.on_external_action(func, "sdf", "qd")
 
 s = Stage('s', display_log=False)
 # s.add_constraint(cons)
-s.add_constraint(cons1)
+s.add_constraint(cons)
 
 # s2 = Stage('s2')
 # cons = createCon1()
@@ -68,14 +63,17 @@ s.add_constraint(cons1)
 sg = StageGroup()
 sg.add_stage(s)
 sg.start()
+s.start_constraint("con")
+print(s.get_constraint("con").configuration_inputs)
+
 # s.start()
 # s.start_constraint("con")
-con = s.get_constraint("con2")
-# con.start_listen()
-# sleep(1)
-con.send_listen_data("user", "hello")
-con.send_listen_data("admin", "hi")
-con.send_listen_data("user", "how are u")
+# con = s.get_constraint("con2")
+# # con.start_listen()
+# # sleep(1)
+# con.send_listen_data("user", "hello")
+# con.send_listen_data("admin", "hi")
+# con.send_listen_data("user", "how are u")
 # s.start_constraint("con2")
 # s.get_constraint("con2").start_admin()
 

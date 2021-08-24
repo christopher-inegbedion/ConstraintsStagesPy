@@ -217,6 +217,9 @@ class Model:
         if self.input_mode == ConstraintInputMode.PRE_DEF:
             self.growable = True
 
+    def add_configuration_input(self, data, key=None):
+        self.constraint.add_configuration_input(data, key, False)
+
     # ------------------
 
     def check_constraint_initial_input_enabled(self, data):
