@@ -398,7 +398,7 @@ class Constraint(ABC):
                 raise self._raise_exception(
                     f"The maximum number of configuration inputs have been entered. [Input entered: {data}] [Inputs: {self.configuration_inputs}]")
             if key != None:
-                if key not in self.model.config_parameters:
+                if key not in self.model.config_parameters and validation_req:
                     raise self._raise_exception(
                         f"The key provided [{key}] is not a configuration parameter")
 
