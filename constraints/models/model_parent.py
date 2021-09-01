@@ -16,7 +16,10 @@ import logging
 class Model:
     def __init__(self, name: str, model_family: ModelFamily, input_type: InputType,
                  input_mode: ConstraintInputMode,
-                 input_count: int, output_type, admin_session_independent=False, configuration_input_required=False, configuration_input_count=99, initial_input_required=True, config_parameters=[]):
+                 input_count: int, output_type, admin_session_independent=False,
+                 configuration_input_required=False, configuration_input_count=99,
+                 initial_input_required=True, config_parameters=[],
+                 for_payment:bool=False):
         """Abstract model class"""
         # the constraint that is utilizing the model
         self.constraint = None
@@ -26,6 +29,9 @@ class Model:
 
         # value to determine if the model is for a combined constraint or a normal one
         self.model_family = model_family
+
+        # Describes if the model is used to alter a Task's payment info
+        self.for_payment: bool = for_payment
 
         # Determines if initial value input is required. A false value means the input_count param
         # is ignored by the model.
