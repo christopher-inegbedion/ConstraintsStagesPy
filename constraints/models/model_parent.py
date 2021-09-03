@@ -312,10 +312,6 @@ class Model:
                 raise self._raise_exception(INVALID_OUTPUT_TYPE_BOOL_REQUIRED)
 
         # save model's output
-        stage_log_representation = {
-            "name": self.constraint.name,
-            "data": data
-        }
         self.save_output(data)
         self.constraint.flag.complete_constraint(data)
         self.constraint.stage.set_status(

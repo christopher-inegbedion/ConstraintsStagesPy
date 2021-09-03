@@ -4,19 +4,19 @@ Stages and Constraints provide a platform for numerous jobs/processes/services t
 
 This aim of this project is to provide a means by which different services and processes can be combined and connected together to form a cohesive unit that solves a problem, or provide a unique experience.
 
-The idea was to provide a means for "lego-like" means of customisation where 1 or more constraints could be combined to create unique experiences for the users. The main goal of the project is to provide a platform where people can fulfil their imaginations and come up with ideas/solutions for problems/tasks.
-
+The idea was to provide a means for "lego-like" means of customisation where 1 or more constraints could be combined to create unique experiences for the users.
 ## Constraints
 A constraint is a process that accepts some **INPUT**, passes it to its **MODEL** and produces some **OUTPUT** at the end. Constraints can be mixed and matched together to provide a variety of possible outcomes/possibilities. They can be as simple or complex as required, with some constraints being able to accept more than 1 output while others accept none and still produce some **OUTPUT**
 
 ### Creating a constraint
-A constraint has 2 basic requirements which are its name and a model. To create a constraint the `CustomConstraint` class is used and then a name and any model is passed to it. In the case below the name chosen is "Test constraint" and the **MODEL** of choice is `TestModel()`.
+A constraint has 2 basic requirements which are its name and a model. To create a constraint the `CustomConstraint` class is used and then a name, description and any model is passed to it.
 ```python
 # This is an example of a basic constraint
 name = "Test constraint"
+desc = "description"
 model = TestModel()
 
-constraint = CustomConstraint(name, model)
+constraint = CustomConstraint(name, desc, model)
 ```
 A major part of a constraint's operation involves its **MODEL**, this performs the work of the constraint and, describes what the constraint does, the types of input(s) the constraint is allowed to accept, the type of output that will be returned, etc. Hence there is only a single class for creating a constraint (`CustomConstraint`), all that needs to be provided to it is its name and the model it'll utilise, (optionally a custom **FLAG** can also be set). On the other hand, there are numerous **MODEL**'s that each perform a specific job and can be used by any constraint.
 

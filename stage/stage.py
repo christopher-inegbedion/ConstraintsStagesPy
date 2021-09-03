@@ -20,13 +20,28 @@ class Stage(Observer):
     """A collection of constraints"""
 
     def __init__(self, name: str, display_log=False):
+        # The name of the stage
         self.name = name
+
+        # The constraints in the stage
         self.constraints: List[Constraint] = []
+
+        # The stage's StageGroup
         self.stage_group: StageGroup = None
+
+        # The status of the Stage
         self.status: StageStatus = StageStatus.NOT_STARTED
+
+        # A value that determines if the stage has started
         self.has_stage_started = False
+
+        # A log that keeps track of the stage's events
         self.log = StageLog()
+
+        # The stage's Pipeline
         self.pipeline = None
+
+        # Determines if the log should be displayed in the terminal
         self._display_log = display_log
 
         # The current constraint running
@@ -47,8 +62,11 @@ class Stage(Observer):
         if self.stage_group == None:
             raise Exception("A stage group does not exist")
 
+        # This prevents more than 1 stage in a Stage group from starting
         with self.stage_group.stage_thread_instance_lock:
-            print(f">>{self.name} stage STARTED")
+            if self._display_log:
+                print(f">>{self.name} stage STARTED")
+
             if self.pipeline != None:
                 self.pipeline.current_stage = self
 
@@ -57,8 +75,8 @@ class Stage(Observer):
             if len(self.constraints) > 0:
                 self.stage_group.set_current_stage(self)
             else:
-                raise Exception(
-                    "Constraints have not been passed to this stage")
+                self.set_status(
+                    StageStatus.ERROR, "Constraints have not been passed to this stage")
 
             while self.status != StageStatus.COMPLETE:
                 if len(self.running_constraints) > 0:
@@ -72,7 +90,8 @@ class Stage(Observer):
 
     def _complete(self):
         """Complete the stage"""
-        print(f">>{self.name} stage COMPLETE")
+        if self._display_log:
+            print(f">>{self.name} stage COMPLETE")
         self.running_constraints.clear()
         self.stage_group.stage_complete(self.name)
         self.set_status(StageStatus.COMPLETE, self.name)
@@ -145,6 +164,10 @@ class Stage(Observer):
         # A constraint just completed
         elif status == StageStatus.CONSTRAINT_COMPLETED:
             msg = f"Stage [{self.name}]'s constraint [{data}] has completed"
+
+        # An error occured
+        elif status == StageStatus.ERROR:
+            msg = data
         else:
             msg = f"StageStatus [{status}] has not been implemented"
             status = StageStatus.ERROR

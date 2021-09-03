@@ -5,7 +5,10 @@ class StageLog:
     """Record Stage events"""
 
     def __init__(self):
+        # Stores all the events in the stage
         self.events = {}
+
+        # The stage's most recent update
         self.most_recent_update = {}
         self._init()
         self.pipeline = None
@@ -31,5 +34,8 @@ class StageLog:
             self.most_recent_update = {
                 "event": event, "value": value, "msg": msg}
             self.notify()
+
+            if event == StageStatus.ERROR:
+                raise Exception(msg)
         else:
             raise Exception(f"Stage event type '{event}' cannot be found")

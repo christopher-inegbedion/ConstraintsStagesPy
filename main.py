@@ -5,7 +5,7 @@ from constraints.models.example_models.constraint_input_model import ConstraintI
 from constraints.models.example_models.keyword_model import KeywordModel
 from constraints.models.example_models.test_combined_constraint import TestCombinedConstraintModel
 from constraints.models.example_models.test_model import TestModel
-from constraints.models.example_models.task_model import TaskModel
+# from constraints.models.example_models.task_model import TaskModel
 from constraints.models.example_models.verification_model import VerificationModel
 from stage.stage import Stage, StageGroup
 import time
@@ -17,24 +17,24 @@ class Task:
         self.name = name
 
 
-constraint1 = CustomConstraint("test1", TestModel(), debug=True)
+constraint1 = CustomConstraint("test1", "desc", TestModel(), debug=True)
 constraint1.add_input(4)
-constraint2 = CustomConstraint("test2", TestModel())
+constraint2 = CustomConstraint("test2", "desc", TestModel())
 constraint2.add_input(4)
-constraint3 = CustomConstraint("test3", TestModel(), debug=True)
+constraint3 = CustomConstraint("test3", "desc", TestModel(), debug=True)
 constraint3.add_input(4)
-constraint4 = CustomConstraint("test4", TestModel())
+constraint4 = CustomConstraint("test4", "desc", TestModel())
 constraint4.add_input(4)
 
 combined_constraint = CustomConstraint(
-    "combined constraint", TestCombinedConstraintModel(), debug=True)
+    "combined constraint", "desc", TestCombinedConstraintModel(), debug=True)
 combined_constraint.add_input(constraint1)
 combined_constraint.add_input(constraint2)
 
 time_constraint = CustomConstraint(
-    "time", PauseModel(), debug=False
+    "time", "desc", PauseModel(), debug=True
 )
-time_constraint.add_input(20)
+time_constraint.add_input(1)
 
 stage = Stage("stage 1")
 stage.add_constraint(time_constraint)
@@ -59,6 +59,9 @@ stage_group.add_stage(stage2)
 # stage.stop_constraint("time")
 # stage.start_constraint("combined constraint")
 
-task_constraint = CustomConstraint("Task constraint", TaskModel())
-task_constraint.add_input(Task('task'))
-task_constraint.start()
+# task_constraint = CustomConstraint("Task constraint", TaskModel())
+# task_constraint.add_input(Task('task'))
+# task_constraint.start()
+
+stage_group.start("stage 1")
+stage.start_constraint("time")
