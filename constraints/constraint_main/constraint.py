@@ -40,6 +40,9 @@ class Constraint(ABC):
         # constraint's input(s)
         self.inputs = []
 
+        # This variable is used when the model completes to store analytics information
+        self.completion_data = {}
+
         # constraint's configuration inputs
         self.configuration_inputs = {}
 
