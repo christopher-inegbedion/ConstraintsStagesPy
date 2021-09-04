@@ -290,7 +290,7 @@ class StageGroup:
                               "status": "complete", "constraint_data": []}
                 for con in stage.constraints:
                     stage_data["constraint_data"].append(
-                        {"constraint_name": con.name, "data": con.model.output})
+                        {"constraint_name": con.name, "data": con.completion_data})
                 details.append(stage_data)
             elif stage.status == StageStatus.ACTIVE:
                 stage_data = {"stage_name": stage.name,
