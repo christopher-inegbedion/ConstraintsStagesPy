@@ -9,8 +9,9 @@ class CustomConstraint(Constraint):
     This class enables to creation of constraints by just assigning it a name(for debugging) and
      a model of choice to get started"""
 
-    def __init__(self, name, description, model, flag=None, debug=False, completion_data_labels=[]):
-        super().__init__(name, description, flag, model, debug, completion_data_labels)
+    def __init__(self, name, description, model, is_admin_input_required, flag=None, debug=False, completion_data_labels=[]):
+        super().__init__(name, description, flag, model,
+                         is_admin_input_required, debug, completion_data_labels)
 
     def start(self, d=False):
         super().start(d=self.debug)
