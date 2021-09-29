@@ -15,13 +15,3 @@ class CustomConstraint(Constraint):
 
     def start(self, d=False):
         super().start(d=self.debug)
-
-    def to_json(self):
-        return {
-            "constraint_name": self.name,
-            "constraint_desc": self.description,
-            "config_inputs": self.configuration_inputs,
-            "is_admin_input_required": self.is_admin_input_required,
-            "required": self.model.initial_input_required or self.is_admin_input_required,
-            "completition_data_labels": self.completion_data_labels,
-        }
