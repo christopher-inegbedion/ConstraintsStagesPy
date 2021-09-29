@@ -1,3 +1,4 @@
+from constraints.constraint_main.constraint import Constraint
 from constraints.models.model_parent import Model
 from constraints.enums.model_family import ModelFamily
 from constraints.enums.input_type import InputType
@@ -12,7 +13,7 @@ class TimeModel(Model):
         self.name = "TimeModel"
         self.model_family = ModelFamily.CONSTRAINT
         self.input_type = InputType.INT
-        self.input_mode = ConstraintInputMode.USER
+        self.input_mode = ConstraintInputMode.PRE_DEF
         self.input_count = 1
         self.output_type = InputType.BOOL
 
@@ -29,9 +30,14 @@ class TimeModel(Model):
             seconds=time_ahead_from_input).format("ss")
 
         while arrow.now().format("ss") != time_ahead:
-            print(f"waiting...")
+            # print(f"waiting...")
+            pass
+
+        self.add_configuration_input("data", "key")
 
         self._complete(True)
 
     def _complete(self, data, aborted=False):
         super()._complete(data)
+        constraint: Constraint = self.constraint
+        constraint.completion_data = constraint.configuration_inputs

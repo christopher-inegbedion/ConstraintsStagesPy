@@ -1,4 +1,4 @@
-from constraints.models.example_models.product_description_model import ProductDescriptionModel
+from constraints.models.example_models.time_model import TimeModel
 from multiprocessing.spawn import freeze_support
 from constraints.models.example_models.chat_model import ChatModel
 from constraints.models.example_models.keyword_model import KeywordModel
@@ -15,7 +15,7 @@ from constraints.constraint_main.custom_constraint import CustomConstraint
 
 
 def createCon1():
-    return CustomConstraint("con", "desc", ProductDescriptionModel(), debug=True)
+    return CustomConstraint("con", "desc", TimeModel(), debug=True)
 
 
 def createCon2():
@@ -37,6 +37,7 @@ def func1(data, args):
 
 
 cons = createCon1()
+cons.add_input(1)
 cons1 = createCon2()
 cons3 = createCon3()
 
@@ -64,7 +65,8 @@ sg = StageGroup()
 sg.add_stage(s)
 sg.start()
 s.start_constraint("con")
-print(s.get_constraint("con").configuration_inputs)
+sleep(2)
+print(s.get_constraint("con").completion_data)
 
 # s.start()
 # s.start_constraint("con")
