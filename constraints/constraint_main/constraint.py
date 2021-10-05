@@ -17,7 +17,7 @@ import logging
 class Constraint(ABC):
     """Abstract constraint class"""
 
-    def __init__(self, name: str, description: str, flag: Flag, model: Model, is_admin_input_required, debug=False, completion_data_labels=[]):
+    def __init__(self, name: str, description: str, flag: Flag, model: Model, is_admin_input_required, can_be_previewed, debug=False, completion_data_labels=[]):
         """Each constraint has a flag and model
 
         Flag :- The flag defines the properties for the constraint
@@ -39,16 +39,20 @@ class Constraint(ABC):
 
         # constraint's input(s)
         self.inputs = []
-        
+
         # Defines if the constraint's admin will be providing any input to the constraint
         self.is_admin_input_required = is_admin_input_required
+
+        # Determines if the cosntraint can be previewed. Constraints that can be previewed do not depend
+        # on other constraint's to be viewed or needs no input to start.
+        self.can_be_previewed = can_be_previewed
 
         # The titles of each completion data.This is used
         self.completion_data_labels = completion_data_labels
 
         # This variable is used when the model completes to store analytics information
         self.completion_data = {}
-        
+
         # constraint's configuration inputs
         self.configuration_inputs = {}
 
@@ -109,7 +113,7 @@ class Constraint(ABC):
 
     @abstractmethod
     def start(self, d: bool = False):
-        """This method starts the constraint. This is where the inputs are retrieved and passed to the model"""
+        """This method starts the constraint and model. This is where the inputs are retrieved and passed to the model"""
         self.debug = d
         # initialize the constraint's flag details.
 
@@ -204,22 +208,6 @@ class Constraint(ABC):
                     admin_func_thread.run()
                     self.admin_status = AdminStatus.COMPLETE
                     break
-
-    # def start_listen(self):
-    #     threading.Thread(target=self._start_listen, daemon=True).start()
-
-    # def _start_listen(self):
-    #     while True:
-    #         with self.listen_msg_lock:
-    #             self.model.listen()
-
-    def get_listen_msg(self):
-        return self.listen_msg
-
-    def send_listen_data(self, msg: str, data):
-        self.listen_msg = msg
-        self.listen_data = data
-        self.model.listen(msg, data)
 
     def get_model_input_type(self):
         """Return the type of input required"""
@@ -470,11 +458,15 @@ class Constraint(ABC):
         return Exception(exception_msg+extra_info)
 
     def to_json(self):
+        """Convert the constraint object to json. 
+
+        Used when saving the constraint's details to the db"""
         return {
             "constraint_name": self.name,
             "constraint_desc": self.description,
             "config_inputs": self.configuration_inputs,
             "is_admin_input_required": self.is_admin_input_required,
+            "can_be_previewed": self.can_be_previewed,
             "required": self.model.initial_input_required or self.is_admin_input_required,
             "completition_data_labels": self.completion_data_labels,
         }

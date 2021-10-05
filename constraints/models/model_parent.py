@@ -19,7 +19,7 @@ class Model:
                  input_count: int, output_type, admin_session_independent=False,
                  configuration_input_required=False, configuration_input_count=99,
                  initial_input_required=True, config_parameters=[],
-                 for_payment:bool=False):
+                 for_payment: bool = False):
         """Abstract model class"""
         # the constraint that is utilizing the model
         self.constraint = None
@@ -202,7 +202,7 @@ class Model:
                 break
 
     def abort(self, msg=""):
-        """Stop the constraint"""
+        """Terminates the model"""
         if self.constraint.flag.status == ConstraintStatus.ACTIVE:
             if msg != "":
                 print(msg)
@@ -224,6 +224,7 @@ class Model:
             self.growable = True
 
     def add_configuration_input(self, data, key=None):
+        """Add data to the model's configuration input"""
         self.constraint.add_configuration_input(data, key, False)
 
     # ------------------
@@ -268,14 +269,18 @@ class Model:
 
     @abstractmethod
     def run(self, inputs: list, configuration_inputs={}):
-        """Method that works on the input(s) provided and produces output"""
+        """This is the default method that and runs the function specified in its body and terminates the model when complete.
+
+        It works on the input(s) provided and produces output"""
         if self.constraint is None:
             raise self._raise_exception(CONSTRAINT_NOT_SET)
 
         # performs a check for combined constraint models to ensure their constraint's have initial input enabled
         self.check_constraint_initial_input_enabled(inputs)
-        self.constraint.stage.set_status(
-            StageStatus.CONSTRAINT_STARTED, self.constraint.name)
+
+        if self.constraint.stage != None:
+            self.constraint.stage.set_status(
+                StageStatus.CONSTRAINT_STARTED, self.constraint.name)
 
     @abstractmethod
     def run_admin(self):
@@ -285,15 +290,19 @@ class Model:
 
     @abstractmethod
     def listen(self, msg, data):
+        """This enables the model to be called at different times without neccessarily completing and return a different value based on the data passed.
+
+        This method is different from the run(..) method because when the method completes running it does not terminate except the complete(..) 
+        method is called"""
         self.constraint.listen_msg = None
         self.constraint.listen_data = None
 
     @abstractmethod
     def _complete(self, data, aborted=False):
-        """Method that ends the constraint.
+        """Method that ends the model.
         'aborted' argument is True if the model was aborted
 
-        This method is called from run(...) method"""
+        This method is called from the run(...) method"""
         if aborted or self.aborted:
             self.aborted = aborted
         else:
@@ -314,10 +323,13 @@ class Model:
         # save model's output
         self.save_output(data)
         self.constraint.flag.complete_constraint(data)
-        self.constraint.stage.set_status(
-            StageStatus.CONSTRAINT_COMPLETED, self.constraint.name)
+
+        if self.constraint.stage != None:
+            self.constraint.stage.set_status(
+                StageStatus.CONSTRAINT_COMPLETED, self.constraint.name)
 
     def save_output(self, data):
+        """Saves the output of the model. This is enables the output of a constrint to be used as the input of another constraint"""
         self.output = data
         self.constraint.output = data
 

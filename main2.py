@@ -1,4 +1,6 @@
+from task_main.task import Task
 from constraints.models.example_models.time_model import TimeModel
+from constraint_models.product_description_model import ProductDescriptionModel
 from multiprocessing.spawn import freeze_support
 from constraints.models.example_models.chat_model import ChatModel
 from constraints.models.example_models.keyword_model import KeywordModel
@@ -15,15 +17,15 @@ from constraints.constraint_main.custom_constraint import CustomConstraint
 
 
 def createCon1():
-    return CustomConstraint("con", "desc", TimeModel(), debug=True)
+    return CustomConstraint("con", "desc", TimeModel(), is_admin_input_required=False, debug=True)
 
 
 def createCon2():
-    return CustomConstraint("con2", "desc", ChatModel(), debug=False)
+    return CustomConstraint("con2", "desc", ChatModel(), is_admin_input_required=False, debug=False)
 
 
 def createCon3():
-    return CustomConstraint("con3", "desc", KeywordModel(), debug=True)
+    return CustomConstraint("con3", "desc", KeywordModel(), is_admin_input_required=False, debug=True)
 
 
 def func(constraint_name, command, data, args):
@@ -36,8 +38,15 @@ def func1(data, args):
     # pass
 
 
+pd = CustomConstraint("cons", "desc", ProductDescriptionModel(),
+                      is_admin_input_required=False, debug=True)
+task = Task("product name", "prodct desc")
+pd.set_task_instance(task)
+pd.start()
+
 cons = createCon1()
-cons.add_input(1)
+# cons.add_input(1)
+# cons.start()
 cons1 = createCon2()
 cons3 = createCon3()
 
@@ -63,57 +72,5 @@ s.add_constraint(cons)
 
 sg = StageGroup()
 sg.add_stage(s)
-sg.start()
-s.start_constraint("con")
-sleep(2)
-print(s.get_constraint("con").completion_data)
-
-# s.start()
+# sg.start()
 # s.start_constraint("con")
-# con = s.get_constraint("con2")
-# # con.start_listen()
-# # sleep(1)
-# con.send_listen_data("user", "hello")
-# con.send_listen_data("admin", "hi")
-# con.send_listen_data("user", "how are u")
-# s.start_constraint("con2")
-# s.get_constraint("con2").start_admin()
-
-# sg.add_stage(s2)
-# sg.add_stage(s2)
-
-# sg.start('s')
-
-# s.start_constraint("con")
-# s.start_constraint("con2")
-
-
-# pipe = Pipeline(Task("name", "desc"), sg)
-# pipe.start_stage("s")
-# pipe.start_constraint("s", "con3")
-# pipe.start_constraint("s2", "con")
-# print(sg.get_stage_group_details())
-# sleep(2)
-# pipe.start_constraint("s2", "con")
-
-# pipe.start_stage("s2")
-
-
-# sg = StageGroup()
-
-# sg.add_stage(s)
-
-
-# sleep(1)
-# cons.add_input("EUR")
-# cons.add_input("USD")
-# cons1.add_input("NGN")
-# cons1.add_input("USD")
-# print()
-# sg.start('s2')
-# sleep(1)
-
-# s.start_constraint("con")
-# s.start_constraint("con2")
-
-# print(cons.flag.log.events)
