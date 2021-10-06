@@ -17,7 +17,7 @@ import logging
 class Constraint(ABC):
     """Abstract constraint class"""
 
-    def __init__(self, name: str, description: str, flag: Flag, model: Model, is_admin_input_required, can_be_previewed, debug=False, completion_data_labels=[]):
+    def __init__(self, name: str, description: str, flag: Flag, model: Model, is_admin_input_required, can_be_previewed, constraint_thumbnail_descriptior="", debug=False, completion_data_labels=[]):
         """Each constraint has a flag and model
 
         Flag :- The flag defines the properties for the constraint
@@ -49,6 +49,9 @@ class Constraint(ABC):
 
         # The titles of each completion data.This is used
         self.completion_data_labels = completion_data_labels
+        
+        # A visual descriptior of the constraint. A link to a GIF or Image
+        self.constraint_thumbnail_descriptior = constraint_thumbnail_descriptior
 
         # This variable is used when the model completes to store analytics information
         self.completion_data = {}
