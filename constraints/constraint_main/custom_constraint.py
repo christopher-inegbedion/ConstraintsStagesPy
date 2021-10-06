@@ -11,7 +11,7 @@ class CustomConstraint(Constraint):
 
     def __init__(self, name, description, model, is_admin_input_required, can_be_previewed=False, constraint_thumbnail_descriptior="", flag=None, debug=False, completion_data_labels=[]):
         super().__init__(name, description, flag, model,
-                         is_admin_input_required, can_be_previewed, debug, completion_data_labels, constraint_thumbnail_descriptior=constraint_thumbnail_descriptior)
+                         is_admin_input_required, can_be_previewed, constraint_thumbnail_descriptior, debug, completion_data_labels, )
 
     def start(self, d=False):
         super().start(d=self.debug)
