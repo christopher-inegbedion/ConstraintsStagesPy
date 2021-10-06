@@ -472,4 +472,5 @@ class Constraint(ABC):
             "can_be_previewed": self.can_be_previewed,
             "required": self.model.initial_input_required or self.is_admin_input_required,
             "completition_data_labels": self.completion_data_labels,
+            "image_desc_url": self.constraint_thumbnail_descriptior
         }
