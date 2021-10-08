@@ -211,7 +211,15 @@ class Constraint(ABC):
                     admin_func_thread.run()
                     self.admin_status = AdminStatus.COMPLETE
                     break
+    
+    def get_listen_msg(self):
+        return self.listen_msg
 
+    def send_listen_data(self, msg: str, data):
+        self.listen_msg = msg
+        self.listen_data = data
+        self.model.listen(msg, data)
+    
     def get_model_input_type(self):
         """Return the type of input required"""
         return self.model.input_type
