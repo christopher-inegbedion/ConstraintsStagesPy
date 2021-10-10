@@ -300,3 +300,9 @@ class StageGroup:
                 stage_data = {"stage_name": stage.name,
                               "status": "not_started", "constraint_data": []}
         return details
+
+    def get_first_constraint_name(self):
+        first_stage: Stage = self.stages[0]
+        first_constraint: Constraint = first_stage.constraints[0]
+        
+        return first_constraint.name
